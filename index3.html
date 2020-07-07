@@ -11,43 +11,27 @@
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
   </head>
   <body>
-
-
-<!-- 
-<table
-  id="table"
-  data-toggle="table"
-  data-flat="true"
-  data-search="true"
-  data-url="json/masteroutput.json">
-  <thead>
-    <tr>
-      <th data-field="Name" data-sortable="true">Name</th>
-      <th data-field="Investments" data-sortable="true">Investments</th>
-      <th data-field="Total_Funding" data-sortable="true">Total Funding</th>
-    </tr>
-  </thead>
-</table> -->
-
-<table
-  id="table"
-  
-  data-url="masteroutput.json">
-  <thead>
-    <tr>
-      <th data-field="Name">Name</th>
-      <th data-field="Investments">Investments</th>
-      <th data-field="Total_Funding">Total Funding</th>
-    </tr>
-  </thead>
-</table>
-
-
-<script>
-    $(table).bootstrapTable('refresh', {
-        url: 'https://raw.githubusercontent.com/wenzhixin/bootstrap-table-examples/master/json/data1.json'
-    });
-</script>
+    <table data-toggle="table">
+      <thead>
+        <tr>
+          <th>Item ID</th>
+          <th>Item Name</th>
+          <th>Item Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Item 1</td>
+          <td>$1</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Item 2</td>
+          <td>$2</td>
+        </tr>
+      </tbody>
+    </table>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

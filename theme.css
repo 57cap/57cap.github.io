@@ -17,14 +17,14 @@ h1{
 
 h2{
   font-size: 40px;
-  color: #6bc5d2;
-  text-align: left;
+  color: #000000;
+  text-align: center;
   margin-right: 20px;
 }
 
 h3{
   font-size: 18px;
-  color: #6bc5d2;
+  color: #000000;
   text-align: center;
   margin-right: 20px;
 }
@@ -72,7 +72,7 @@ a:hover{
 }
 
 .box1{
-  color: #626262;
+  color: #ffffff;
   background-color: #F4A0A5;
 }
 
@@ -90,7 +90,7 @@ a:hover{
 }
 
 .box2{
-  color: #626262;
+  color: #ffffff;
   background-color: #FFCFAC;
 }
 
@@ -108,7 +108,7 @@ a:hover{
 }
 
 .box3{
-  color: #626262;
+  color: #ffffff;
   background-color: #F8E16B;
 }
 
@@ -126,7 +126,7 @@ a:hover{
 }
 
 .box4{
-  color: #626262;
+  color: #ffffff;
   background-color: #BBE19E;
 }
 
@@ -144,7 +144,7 @@ a:hover{
 }
 
 .box5{
-  color: #626262;
+  color: #ffffff;
   background-color: #9ED1E1;
 }
 
@@ -162,7 +162,7 @@ a:hover{
 }
 
 .box6{
-  color: #626262;
+  color: #ffffff;
   background-color: #9EB1E1;
 }
 
