@@ -40,10 +40,10 @@ a{
   transition: 0.2s;
 }
 
-a:hover{
+/*a:hover{
   transition: 0.2s;
   margin-left: 5px;
-}
+}*/
 
 .nav{
   display: flex;

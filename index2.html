@@ -1,63 +1,121 @@
-<!DOCTYPE html>
-<html lang="EN">
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>EM Ranker</title>
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
     <link rel="icon" href="logo.png" />
-    <title> EM Ranker </title>
-
   </head>
 
+
   <body>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
 
-    <!-- <div class="nav"> -->
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBJajMw3xLOBGxukDI_QD7CdYMP2UN0WnY",
+        authDomain: "ranker-dc503.firebaseapp.com",
+        databaseURL: "https://ranker-dc503.firebaseio.com",
+        projectId: "ranker-dc503",
+        storageBucket: "ranker-dc503.appspot.com",
+        messagingSenderId: "164197493785",
+        appId: "1:164197493785:web:c95f8fa6ff0b4738568e88",
+        measurementId: "G-WQ5W36HV54"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    </script>
+
+    <br>
     <div>
-      <h2>EM Ranker</h2>
+      <!-- <img src="recast.jpg" alt="Recast Capital" width="300"> -->
+      <a href="https://www.recastcapital.com/">
+         <img alt="logo" src="recast.jpg" width="300">
+      </a>
     </div>
+    <br>
+  
+<!--     <table
+    data-toggle="table"
+    data-url="export.json"
+    data-height="580"
+    data-search="true"
+    data-sort-name="holistic"
+    data-sort-order="desc"
+    id="table">
+      <thead>
+        <tr id="tr">
+          <th data-field="id" data-sortable="true">Ranking</th>
+          <th data-field="name" data-sortable="true">Name</th>
+          <th data-field="foundingYear" data-sortable="true">Founding Year</th>
+          <th data-field="location" data-sortable="false">Location</th>
+          <th data-field="investments" data-sortable="true">Investments</th>
+          <th data-field="score" data-sortable="true">Score</th>
+        </tr>
+      </thead>
+    </table> -->
+
+    <table class="table table-hover" id="table">
+      <thead>
+        <tr id="tr">
+          <th>Ranking</th>
+          <th>Name</th>
+          <th>Founding Year</th>
+          <th>Location</th>
+          <th>Investments</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+    </table>
+
+    <script>
+    var database = firebase.database();
+    database.ref().once('value', function(snapshot){
+        if(snapshot.exists()){
+            var content = '';
+            snapshot.forEach(function(data){
+                var val = data.val();
+                content +='<tr>';
+                content += '<td>' + val.id + '</td>';
+                content += '<td>' + val.name + '</td>';
+                content += '<td>' + val.foundingYear + '</td>';
+                content += '<td>' + val.location + '</td>';
+                content += '<td>' + val.investments + '</td>';
+                content += '<td>' + val.score + '</td>';
+                content += '</tr>';
+            });
+            $('#table').append(content);
+            }
+        });
+    </script>
 
     <br>
     <br>
+    <br>
 
-    <div class ="flex">
-      <div class="box box1">
-        <h1> Box 1 </h1>
-        <p><a>stuff</a></p>
-        <!-- adding the a tag makes stuff move - check the hover stuff in theme.css -->
-      </div>
+    <!-- <div>
+      <h3>Last Updated July 7, 2020</h3>
+    </div> -->
 
-      <div class="box box2">
-        <h1> Box 2 </h1>
-        <p><a>stuff</a></p>
-        <!-- you can also add lists with the <ul> tag, but google it  -->
-      </div>
+    <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
 
-      <div class="box box3">
-        <h1> Box 3 </h1>
-        <p><a>stuff</a></p>
-        <!-- you could just take out the headers in theme.css and make is so that each box is its own project, and use <a> tags to link to a new page that has info on your project (like description, process, pictures) -->
-      </div>
 
-      <div class="box box4">
-        <h1> Box 4 </h1>
-        <p><a>stuff</a></p>
-      </div>
-
-      <div class="box box5">
-        <h1> Box 5 </h1>
-        <p><a>stuff</a></p>
-      </div>
-
-      <div class="box box6">
-        <h1> Box 6 </h1>
-        <p><a>stuff</a></p>
-      </div>
-    </div>
-
-    <div>
-      <h3>EM Ranker</h3>
-    </div>
-
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
   </body>
 </html>
