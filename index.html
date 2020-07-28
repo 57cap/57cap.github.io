@@ -11,9 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
     <link rel="icon" href="logo.png" />
-
-    <!-- <script src="sort-table.js"></script>
-    <link rel="stylesheet" href="sort-table.css"> -->
   </head>
 
 
@@ -53,45 +50,11 @@
     </div>
     <br>
     <br>
-  
-<!--     <table
-    data-toggle="table"
-    data-url="export.json"
-    data-height="550"
-    data-search="true"
-    data-sort-name="holistic"
-    data-sort-order="desc"
-    id="table">
+
+    <table class="table table-hover" id="table">
       <thead>
         <tr id="tr">
-          <th data-field="id" data-sortable="true">Ranking</th>
-          <th data-field="name" data-sortable="true">Name</th>
-          <th data-field="foundingYear" data-sortable="true">Founding Year</th>
-          <th data-field="location" data-sortable="false">Location</th>
-          <th data-field="investments" data-sortable="true">Investments</th>
-          <th data-field="score" data-sortable="true">Score</th>
-        </tr>
-      </thead>
-    </table>
- -->
-
-    <!-- <table class="js-sort-table" id="table"> -->
-      <table class="table table-hover" id="table">
-      
-      <thead>
-        <tr id="tr">
-          <th>Ranking</th>
-          <th>Name</th>
-          <th>Founding</th>
-          <th>Description</th>
-          <th>Location</th>
-          <th>Portfolio</th>
-          <th>Investments</th>
-          <th>Industries</th>
-          <th>Score</th>
-          <th>Website</th>
-
-          <!-- <th>id</th>
+          <th>Rankings</th>
           <th>Name</th>
           <th>Founding Year</th>
           <th>Location</th>
@@ -101,15 +64,15 @@
           <th>Lead Investments</th>
           <th>Exits</th>
           <th>Exits IPO</th>
-          <th>IRR</th>
-          <th>TVPI</th>
-          <th>DPI</th>
-          <th>RVPI</th>
-          <th>Contributed</th>
-          <th>Distributed</th>
-          <th>Distributed NAV</th>
-          <th>Fund NAV</th>
-          <th>Gain Since Inception</th>
+          <!-- <th>IRR</th> -->
+          <!-- <th>TVPI</th> -->
+          <!-- <th>DPI</th> -->
+          <!-- <th>RVPI</th> -->
+          <!-- <th>Contributed</th> -->
+          <!-- <th>Distributed</th> -->
+          <!-- <th>Distributed NAV</th> -->
+          <!-- <th>Fund NAV</th> -->
+          <!-- <th>Gain Since Inception</th> -->
           <th>Employees</th>
           <th>Founders</th>
           <th>Industries</th>
@@ -117,14 +80,14 @@
           <th>Funding Rounds</th>
           <th>Fund Status</th>
           <th>Fund Name</th>
-          <th>Last Funding</th>
+          <!-- <th>Last Funding</th> -->
           <th>Total Funding</th>
           <th>Website</th>
-          <th>Crunchbase</th>
-          <th>Last Updated</th>
-          <th>Raw Score</th>
-          <th>Normalized</th>
-          <th>Final Score</th> -->
+          <!-- <th>Crunchbase</th> -->
+          <!-- <th>Last Updated</th> -->
+          <!-- <th>Raw Score</th> -->
+          <!-- <th>Normalized</th> -->
+          <th>Score</th>
         </tr>
       </thead>
     </table>
@@ -141,23 +104,13 @@
                 content += '<td>' + val.id + '</td>';
                 content += '<td>' + val.name + '</td>';
                 content += '<td>' + val.foundingYear + '</td>';
-                content += '<td>' + val.description + '</td>';
                 content += '<td>' + val.location + '</td>';
+                content += '<td>' + val.description + '</td>';
                 content += '<td>' + val.portfolio + '</td>';
                 content += '<td>' + val.investments + '</td>';
-                content += '<td>' + val.industries + '</td>';
-                content += '<td>' + val.score + '</td>';
-
-                // content += '<td>' + val.id + '</td>';
-                // content += '<td>' + val.name + '</td>';
-                // content += '<td>' + val.foundingYear + '</td>';
-                // content += '<td>' + val.location + '</td>';
-                // content += '<td>' + val.description + '</td>';
-                // content += '<td>' + val.portfolio + '</td>';
-                // content += '<td>' + val.investments + '</td>';
-                // content += '<td>' + val.leadInvestments + '</td>';
-                // content += '<td>' + val.exits + '</td>';
-                // content += '<td>' + val.exitsIPO + '</td>';
+                content += '<td>' + val.leadInvestments + '</td>';
+                content += '<td>' + val.exits + '</td>';
+                content += '<td>' + val.exitsIPO + '</td>';
                 // content += '<td>' + val.irr + '</td>';
                 // content += '<td>' + val.tvpi + '</td>';
                 // content += '<td>' + val.dpi + '</td>';
@@ -167,21 +120,21 @@
                 // content += '<td>' + val.distributedNAV + '</td>';
                 // content += '<td>' + val.fundNAV + '</td>';
                 // content += '<td>' + val.gain + '</td>';
-                // content += '<td>' + val.employees + '</td>';
-                // content += '<td>' + val.founders + '</td>';
-                // content += '<td>' + val.industries + '</td>';
-                // content += '<td>' + val.articles + '</td>';
-                // content += '<td>' + val.fundRounds + '</td>';
-                // content += '<td>' + val.fundStatus + '</td>';
-                // content += '<td>' + val.fundName + '</td>';
+                content += '<td>' + val.employees + '</td>';
+                content += '<td>' + val.founders + '</td>';
+                content += '<td>' + val.industries + '</td>';
+                content += '<td>' + val.articles + '</td>';
+                content += '<td>' + val.fundRounds + '</td>';
+                content += '<td>' + val.fundStatus + '</td>';
+                content += '<td>' + val.fundName + '</td>';
                 // content += '<td>' + val.lastFunding + '</td>';
-                // content += '<td>' + val.totalFunding + '</td>';
-                 content += '<td><a href="website">' + val.website + '</a></td>';
+                content += '<td>' + val.totalFunding + '</td>';
+                content += '<td>' + val.website + '</td>';
                 // content += '<td><a href="#">' + val.crunchbase + '</td>';
                 // content += '<td>' + val.lastUpdated + '</td>';
                 // content += '<td>' + val.raw + '</td>';
                 // content += '<td>' + val.normalized + '</td>';
-                // content += '<td>' + val.score + '</td>';
+                content += '<td>' + val.score + '</td>';
 
                 content += '</tr>';
             });
@@ -190,18 +143,12 @@
         });
     </script>
 
-    <script id=LinkFormatter>
-      function LinkFormatter(value, row, index) {
-        return "<a href='"+row.website+"'>"+value+"</a>";
-      }
-  </script>
-
     <br>
     <br>
     <br>
 
     <!-- <div>
-      <h3>Last Updated July 7, 2020</h3>
+      <h3>Last Updated July 28, 2020</h3>
     </div> -->
 
     <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
