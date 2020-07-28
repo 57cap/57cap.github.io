@@ -2,6 +2,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>EM Ranker</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -10,6 +11,11 @@
 
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
     <link rel="icon" href="logo.png" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
   </head>
 
 
@@ -40,82 +46,150 @@
     </script>
 
     <br>
+    <br>
     <div>
-      <!-- <img src="recast.jpg" alt="Recast Capital" width="300"> -->
       <a href="https://www.recastcapital.com/">
          <img alt="logo" src="recast.jpg" width="300">
       </a>
     </div>
     <br>
+    <br>
   
-<!--     <table
+    <table
+  data-toolbar="#toolbar"
+  data-show-columns="true"
+  data-show-columns-toggle-all="true"
+  data-show-export="true"
+  data-click-to-select="true"
+  data-side-pagination="server"
+
+  data-ajax="ajaxRequest"
+
+    class="table table-hover"
     data-toggle="table"
-    data-url="export.json"
-    data-height="580"
+    data-height="500"
     data-search="true"
     data-sort-name="holistic"
     data-sort-order="desc"
     id="table">
       <thead>
         <tr id="tr">
+          <th data-field="name" data-sortable="true" data-formatter="LinkFormatter">Name</th>
           <th data-field="id" data-sortable="true">Ranking</th>
-          <th data-field="name" data-sortable="true">Name</th>
           <th data-field="foundingYear" data-sortable="true">Founding Year</th>
           <th data-field="location" data-sortable="false">Location</th>
           <th data-field="investments" data-sortable="true">Investments</th>
           <th data-field="score" data-sortable="true">Score</th>
         </tr>
-      </thead>
-    </table> -->
 
-    <table class="table table-hover" id="table">
-      <thead>
-        <tr id="tr">
-          <th>Ranking</th>
-          <th>Name</th>
-          <th>Founding Year</th>
-          <th>Location</th>
-          <th>Investments</th>
-          <th>Score</th>
-        </tr>
       </thead>
+
     </table>
-
     <script>
-    var database = firebase.database();
-    database.ref().once('value', function(snapshot){
-        if(snapshot.exists()){
-            var content = '';
-            snapshot.forEach(function(data){
-                var val = data.val();
-                content +='<tr>';
-                content += '<td>' + val.id + '</td>';
-                content += '<td>' + val.name + '</td>';
-                content += '<td>' + val.foundingYear + '</td>';
-                content += '<td>' + val.location + '</td>';
-                content += '<td>' + val.investments + '</td>';
-                content += '<td>' + val.score + '</td>';
-                content += '</tr>';
-            });
-            $('#table').append(content);
-            }
-        });
+      function LinkFormatter(value, row, index) {
+        return "<a href='"+row.website+"'>"+value+"</a>";
+      }
+
+
+      // $.getJSON("https://ranker-dc503.firebaseio.com/.json", 
+      //   function(data){
+      //     console.log(data);
+      //   });
+
+
+  //     function ajaxRequest(params) {
+  //   var url = 'https://ranker-dc503.firebaseio.com/.json'
+  //   $.get(url + '?' + $.param(params.data)).then(function (res) {
+  //     params.success(res)
+  //   })
+  // }
+
+
+    // function ajaxRequest(params) {
+    //   var params = {data: "value"};
+    //   var url = 'https://ranker-dc503.firebaseio.com/.json'
+    //   $.getJSON(url, function(data) {
+    //   //params.success(res);
+    //     console.log(data);
+    //   });
+    // };
+
+//         function ajaxRequest(params) {
+//       var params = {data: "value"};
+//       var url = 'https://ranker-dc503.firebaseio.com/.json'
+//       $.post('https://ranker-dc503.firebaseio.com/.json',
+//   JSON.stringify(params),
+//   function () {
+//     alert("success");
+//   }
+// );
+//     };
+
+$(".mySelect").change(function () {
+var name     = $('#name').val();
+$.ajax({
+    url     : 'https://ranker-dc503.firebaseio.com/.json',
+    type    : 'POST',
+    dataType: 'json',
+    data    :  {name:name},
+    success: function( data ) {
+        $('#table').bootstrapTable('load', data);
+    }
+    ,
+    error: function(data){
+        alert('Error');
+        }
+    });
+});
+
+
+ //  $(document).ready(function () {
+ //   var data = {};
+
+ //   $.ajax({
+ //     url: 'https://ranker-dc503.firebaseio.com/.json',
+ //     type: "POST",
+ //     data: JSON.stringify(data),
+ //     success: function () {
+ //       alert("success");
+ //       console.log(data);
+ //     },
+ //     error: function(error) {
+ //       alert("error: "+error);
+ //     }
+ //   });
+ // });
+
+
+//  function ajaxRequest(params) {
+//     $.ajax({
+//         type: "POST",
+//         url: "https://ranker-dc503.firebaseio.com/.json",
+//         data: JSON.stringify(param),
+//         success: function (data) {
+//             console.log(data);
+//             params.success({
+//                 "rows": data,
+//                 "total": data.length
+//             },null,{});
+//         },
+//         error: function (er) {
+//             params.error(er);
+//         }
+//     });
+// }
     </script>
 
-    <br>
-    <br>
-    <br>
 
-    <!-- <div>
-      <h3>Last Updated July 7, 2020</h3>
-    </div> -->
+    <br>
+    <br>
+    <br>
 
     <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
 
-
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+    
+    
   </body>
 </html>
