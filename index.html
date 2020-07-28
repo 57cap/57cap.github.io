@@ -12,10 +12,8 @@
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
     <link rel="icon" href="logo.png" />
 
-    <script src="sort-table.js"></script>
-<link rel="stylesheet" href="sort-table.css">
-
-
+    <!-- <script src="sort-table.js"></script>
+    <link rel="stylesheet" href="sort-table.css"> -->
   </head>
 
 
@@ -77,7 +75,9 @@
     </table>
  -->
 
-    <table class="js-sort-table" id="table">
+    <!-- <table class="js-sort-table" id="table"> -->
+      <table class="table table-hover" id="table">
+      
       <thead>
         <tr id="tr">
           <th>Ranking</th>
@@ -85,7 +85,7 @@
           <th>Founding</th>
           <th>Description</th>
           <th>Location</th>
-          <th class="js-sort-number">Portfolio</th>
+          <th>Portfolio</th>
           <th>Investments</th>
           <th>Industries</th>
           <th>Score</th>
@@ -176,7 +176,7 @@
                 // content += '<td>' + val.fundName + '</td>';
                 // content += '<td>' + val.lastFunding + '</td>';
                 // content += '<td>' + val.totalFunding + '</td>';
-                 content += '<td><a href="#">' + val.website + '</a></td>';
+                 content += '<td><a href="website">' + val.website + '</a></td>';
                 // content += '<td><a href="#">' + val.crunchbase + '</td>';
                 // content += '<td>' + val.lastUpdated + '</td>';
                 // content += '<td>' + val.raw + '</td>';
@@ -189,6 +189,12 @@
             }
         });
     </script>
+
+    <script id=LinkFormatter>
+      function LinkFormatter(value, row, index) {
+        return "<a href='"+row.website+"'>"+value+"</a>";
+      }
+  </script>
 
     <br>
     <br>
