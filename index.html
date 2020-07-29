@@ -38,125 +38,113 @@
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       firebase.analytics();
+
+      // Formats website and Crunchbase links in the table
+      function websiteFormatter(value, row, index) {
+        return "<a href='"+row.website+"'>"+value+"</a>";
+      }
+
+      function crunchbaseFormatter(value, row, index) {
+        return "<a href='"+row.crunchbase+"'>"+value+"</a>";
+      }
+
+      // Requests live data from Firebase and connects to the Bootstrap Table
+      var data = [];
+      var fmtdata = [];
+      $.getJSON("https://ranker-dc503.firebaseio.com/.json", 
+         function(data){
+ 
+           var i = 0;
+           var limit = data.length - 1;        
+           for (i = 0; i < limit; i++) {
+             fmtdata.push(data[i+1]);
+           }
+
+           //console.log(fmtdata);
+           
+           $('#table').bootstrapTable({
+            data: fmtdata
+          });   
+      });
     </script>
 
+    <!-- Logo redirects to Recast Capital's website -->
     <br>
     <br>
     <div>
-      <!-- <img src="recast.jpg" alt="Recast Capital" width="300"> -->
       <a href="https://www.recastcapital.com/">
          <img alt="logo" src="recast.jpg" width="300">
       </a>
     </div>
-    <br>
-    <br>
+  
+    <!-- Bootstrap Table -->
+    <table
+    id="table"
+    data-url="export.json"
+    data-sort-name="score"
+    data-sort-order="desc"
 
-    <table class="table table-hover" id="table">
+    data-toggle="table"
+    data-height="560"
+    data-search="true"
+    data-show-columns="true"
+    data-buttons-align="right"
+    data-show-columns-toggle-all="true"
+    data-show-fullscreen="true"
+    data-pagination="false"
+    data-click-to-select="true">
       <thead>
         <tr id="tr">
-          <th>Rankings</th>
-          <th>Name</th>
-          <th>Founding Year</th>
-          <th>Location</th>
-          <th>Description</th>
-          <th>Portfolio</th>
-          <th>Investments</th>
-          <th>Lead Investments</th>
-          <th>Exits</th>
-          <th>Exits IPO</th>
-          <!-- <th>IRR</th> -->
-          <!-- <th>TVPI</th> -->
-          <!-- <th>DPI</th> -->
-          <!-- <th>RVPI</th> -->
-          <!-- <th>Contributed</th> -->
-          <!-- <th>Distributed</th> -->
-          <!-- <th>Distributed NAV</th> -->
-          <!-- <th>Fund NAV</th> -->
-          <!-- <th>Gain Since Inception</th> -->
-          <th>Employees</th>
-          <th>Founders</th>
-          <th>Industries</th>
-          <th>Article Mentions</th>
-          <th>Funding Rounds</th>
-          <th>Fund Status</th>
-          <th>Fund Name</th>
-          <!-- <th>Last Funding</th> -->
-          <th>Total Funding</th>
-          <th>Website</th>
-          <!-- <th>Crunchbase</th> -->
-          <!-- <th>Last Updated</th> -->
-          <!-- <th>Raw Score</th> -->
-          <!-- <th>Normalized</th> -->
-          <th>Score</th>
+          <!-- Comment out any columns that users should not be able to see, such as confidential information from Pitchbook -->
+          <th data-field="id" data-sortable="true">Ranking</th>
+          <th data-field="score" data-sortable="true">Score</th>
+          <th data-field="name" data-sortable="true" data-formatter="websiteFormatter">Name</th>
+          <th data-field="foundingYear" data-sortable="true">Founding Year</th>
+          <th data-field="location" data-sortable="false">Location</th>
+          <th data-field="description" data-sortable="false">Description</th>
+          <th data-field="portfolio" data-sortable="true">Portfolio</th>
+          <th data-field="investments" data-sortable="true">Investments</th>
+          <th data-field="leadInvestments" data-sortable="true">Lead Investments</th>
+          <th data-field="exits" data-sortable="true">Exits</th>
+          <th data-field="exitsIPO" data-sortable="true">Exits IPO</th>
+          <!-- <th data-field="irr" data-sortable="true">IRR</th> -->
+          <!-- <th data-field="tvpi" data-sortable="true">TVPI</th> -->
+          <!-- <th data-field="dpi" data-sortable="true">DPI</th> -->
+          <!-- <th data-field="rvpi" data-sortable="true">RVPI</th> -->
+          <!-- <th data-field="contributed" data-sortable="true">Contributed</th> -->
+          <!-- <th data-field="distributed" data-sortable="true">Distributed</th> -->
+          <!-- <th data-field="distributedNAV" data-sortable="true">Distributed NAV</th> -->
+          <!-- <th data-field="fundNAV" data-sortable="true">Fund NAV</th> -->
+          <!-- <th data-field="gain" data-sortable="true">Gain Since Inception</th> -->
+          <th data-field="employees" data-sortable="false">Employees</th>
+          <th data-field="founders" data-sortable="false">Founders</th>
+          <th data-field="industries" data-sortable="false">Industries</th>
+          <th data-field="articles" data-sortable="true">Article Mentions</th>
+          <!-- <th data-field="fundRounds" data-sortable="true">Total Funding Rounds</th> -->
+          <th data-field="fundStatus" data-sortable="true">Last Fund Status</th>
+          <th data-field="fundName" data-sortable="true">Latest Fund Name</th>
+          <!-- <th data-field="lastFunding" data-sortable="true">Last Funding</th> -->
+          <th data-field="totalFunding" data-sortable="true">Total Funding</th>
+          <!-- <th data-field="name" data-sortable="false" data-formatter="crunchbaseFormatter">Crunchbase</th> -->
+          <!-- <th data-field="lastUpdated" data-sortable="true">Last Updated</th> -->
+          <!-- <th data-field="raw" data-sortable="true">Raw Score</th> -->
+          <!-- <th data-field="normalized" data-sortable="true">Normalized</th> -->
         </tr>
       </thead>
     </table>
 
-    <script>
-    var database = firebase.database();
-    database.ref().once('value', function(snapshot){
-        if(snapshot.exists()){
-            var content = '';
-            snapshot.forEach(function(data){
-                var val = data.val();
-                content +='<tr>';
-
-                content += '<td>' + val.id + '</td>';
-                content += '<td>' + val.name + '</td>';
-                content += '<td>' + val.foundingYear + '</td>';
-                content += '<td>' + val.location + '</td>';
-                content += '<td>' + val.description + '</td>';
-                content += '<td>' + val.portfolio + '</td>';
-                content += '<td>' + val.investments + '</td>';
-                content += '<td>' + val.leadInvestments + '</td>';
-                content += '<td>' + val.exits + '</td>';
-                content += '<td>' + val.exitsIPO + '</td>';
-                // content += '<td>' + val.irr + '</td>';
-                // content += '<td>' + val.tvpi + '</td>';
-                // content += '<td>' + val.dpi + '</td>';
-                // content += '<td>' + val.rvpi + '</td>';
-                // content += '<td>' + val.contributed + '</td>';
-                // content += '<td>' + val.distributed + '</td>';
-                // content += '<td>' + val.distributedNAV + '</td>';
-                // content += '<td>' + val.fundNAV + '</td>';
-                // content += '<td>' + val.gain + '</td>';
-                content += '<td>' + val.employees + '</td>';
-                content += '<td>' + val.founders + '</td>';
-                content += '<td>' + val.industries + '</td>';
-                content += '<td>' + val.articles + '</td>';
-                content += '<td>' + val.fundRounds + '</td>';
-                content += '<td>' + val.fundStatus + '</td>';
-                content += '<td>' + val.fundName + '</td>';
-                // content += '<td>' + val.lastFunding + '</td>';
-                content += '<td>' + val.totalFunding + '</td>';
-                content += '<td>' + val.website + '</td>';
-                // content += '<td><a href="#">' + val.crunchbase + '</td>';
-                // content += '<td>' + val.lastUpdated + '</td>';
-                // content += '<td>' + val.raw + '</td>';
-                // content += '<td>' + val.normalized + '</td>';
-                content += '<td>' + val.score + '</td>';
-
-                content += '</tr>';
-            });
-            $('#table').append(content);
-            }
-        });
-    </script>
-
     <br>
     <br>
     <br>
-
-    <!-- <div>
-      <h3>Last Updated July 28, 2020</h3>
-    </div> -->
 
     <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
 
-
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+    
+    
   </body>
 </html>

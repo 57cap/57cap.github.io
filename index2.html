@@ -1,0 +1,165 @@
+<!-- Rename this file to index.html if you want to use this HTML table instead of the Bootstrap table -->
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>EM Ranker</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
+    <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
+    <link rel="icon" href="logo.png" />
+  </head>
+
+
+  <body>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBJajMw3xLOBGxukDI_QD7CdYMP2UN0WnY",
+        authDomain: "ranker-dc503.firebaseapp.com",
+        databaseURL: "https://ranker-dc503.firebaseio.com",
+        projectId: "ranker-dc503",
+        storageBucket: "ranker-dc503.appspot.com",
+        messagingSenderId: "164197493785",
+        appId: "1:164197493785:web:c95f8fa6ff0b4738568e88",
+        measurementId: "G-WQ5W36HV54"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    </script>
+
+    <br>
+    <br>
+    <div>
+      <a href="https://www.recastcapital.com/">
+         <img alt="logo" src="recast.jpg" width="300">
+      </a>
+    </div>
+    <br>
+    <br>
+
+    <!-- This is a HTML table -->
+    <table class="table table-hover" id="table">
+      <thead>
+        <tr id="tr">
+          <th>Rankings</th>
+          <th>Name</th>
+          <th>Founding Year</th>
+          <th>Location</th>
+          <th>Description</th>
+          <th>Portfolio</th>
+          <th>Investments</th>
+          <th>Lead Investments</th>
+          <th>Exits</th>
+          <th>Exits IPO</th>
+          <!-- <th>IRR</th> -->
+          <!-- <th>TVPI</th> -->
+          <!-- <th>DPI</th> -->
+          <!-- <th>RVPI</th> -->
+          <!-- <th>Contributed</th> -->
+          <!-- <th>Distributed</th> -->
+          <!-- <th>Distributed NAV</th> -->
+          <!-- <th>Fund NAV</th> -->
+          <!-- <th>Gain Since Inception</th> -->
+          <th>Employees</th>
+          <th>Founders</th>
+          <th>Industries</th>
+          <th>Article Mentions</th>
+          <th>Funding Rounds</th>
+          <th>Fund Status</th>
+          <th>Fund Name</th>
+          <!-- <th>Last Funding</th> -->
+          <th>Total Funding</th>
+          <th>Website</th>
+          <!-- <th>Crunchbase</th> -->
+          <!-- <th>Last Updated</th> -->
+          <!-- <th>Raw Score</th> -->
+          <!-- <th>Normalized</th> -->
+          <th>Score</th>
+        </tr>
+      </thead>
+    </table>
+
+    <script>
+    var database = firebase.database();
+    database.ref().once('value', function(snapshot){
+        if(snapshot.exists()){
+            var content = '';
+            snapshot.forEach(function(data){
+                var val = data.val();
+                content +='<tr>';
+
+                content += '<td>' + val.id + '</td>';
+                content += '<td>' + val.name + '</td>';
+                content += '<td>' + val.foundingYear + '</td>';
+                content += '<td>' + val.location + '</td>';
+                content += '<td>' + val.description + '</td>';
+                content += '<td>' + val.portfolio + '</td>';
+                content += '<td>' + val.investments + '</td>';
+                content += '<td>' + val.leadInvestments + '</td>';
+                content += '<td>' + val.exits + '</td>';
+                content += '<td>' + val.exitsIPO + '</td>';
+                // content += '<td>' + val.irr + '</td>';
+                // content += '<td>' + val.tvpi + '</td>';
+                // content += '<td>' + val.dpi + '</td>';
+                // content += '<td>' + val.rvpi + '</td>';
+                // content += '<td>' + val.contributed + '</td>';
+                // content += '<td>' + val.distributed + '</td>';
+                // content += '<td>' + val.distributedNAV + '</td>';
+                // content += '<td>' + val.fundNAV + '</td>';
+                // content += '<td>' + val.gain + '</td>';
+                content += '<td>' + val.employees + '</td>';
+                content += '<td>' + val.founders + '</td>';
+                content += '<td>' + val.industries + '</td>';
+                content += '<td>' + val.articles + '</td>';
+                content += '<td>' + val.fundRounds + '</td>';
+                content += '<td>' + val.fundStatus + '</td>';
+                content += '<td>' + val.fundName + '</td>';
+                // content += '<td>' + val.lastFunding + '</td>';
+                content += '<td>' + val.totalFunding + '</td>';
+                content += '<td>' + val.website + '</td>';
+                // content += '<td><a href="#">' + val.crunchbase + '</td>';
+                // content += '<td>' + val.lastUpdated + '</td>';
+                // content += '<td>' + val.raw + '</td>';
+                // content += '<td>' + val.normalized + '</td>';
+                content += '<td>' + val.score + '</td>';
+
+                content += '</tr>';
+            });
+            $('#table').append(content);
+            }
+        });
+    </script>
+
+    <br>
+    <br>
+    <br>
+
+    <!-- <div>
+      <h3>Last Updated July 28, 2020</h3>
+    </div> -->
+
+    <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+  </body>
+</html>
