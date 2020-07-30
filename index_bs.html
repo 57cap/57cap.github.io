@@ -9,15 +9,12 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
-  
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
     <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
   
-  
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <!-- The core Firebase JS SDK is always required and must be listed firsts -->
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
 
@@ -51,28 +48,9 @@
         return "<a href='"+row.crunchbase+"'>"+value+"</a>";
       }
 
-      // Requests live data from Firebase and connects to the Bootstrap Table
-      var data = [];
-      var fmtdata = [];
-      $.getJSON("https://ranker-dc503.firebaseio.com/.json", 
-         function(data){
- 
-           var i = 0;
-           var limit = data.length - 1;        
-           for (i = 0; i < limit; i++) {
-             fmtdata.push(data[i+1]);
-           }
-
-           //console.log(fmtdata);
-           
-           $('#table').bootstrapTable({
-            data: fmtdata
-          });   
-
-      });
     </script>
-
 <body>
+
     <!-- Logo redirects to Recast Capital's website -->
     <br>
     <br>
@@ -81,21 +59,20 @@
          <img alt="logo" src="recast.jpg" width="300">
       </a>
     </div>
-
+  
     <!-- Bootstrap Table -->
     <table
     id="table"
-    data-url="export.json"
-
     data-toggle="table"
+    data-url="export.json"
     data-height="560"
     data-search="true"
     data-show-columns="true"
-    data-show-columns-toggle-all="true"
     data-buttons-align="right"
+    data-show-columns-toggle-all="true"
     data-show-fullscreen="true">
-        <thead>
-          <tr id="tr">
+      <thead>
+        <tr id="tr">
           <!-- Comment out any columns that users should not be able to see, such as confidential information from Pitchbook -->
           <th data-field="id" data-sortable="true">Ranking</th>
           <th data-field="score" data-sortable="true">Score</th>
@@ -132,8 +109,9 @@
           <!-- <th data-field="raw" data-sortable="true">Raw Score</th> -->
           <!-- <th data-field="normalized" data-sortable="true">Normalized</th> -->
         </tr>
-        </thead>
-      </table>
+      </thead>
+    </table>
+
 
     <br>
     <br>
