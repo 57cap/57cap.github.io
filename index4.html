@@ -1,0 +1,240 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>EM Ranker</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
+    <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
+  
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+  
+
+
+  
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBJajMw3xLOBGxukDI_QD7CdYMP2UN0WnY",
+        authDomain: "ranker-dc503.firebaseapp.com",
+        databaseURL: "https://ranker-dc503.firebaseio.com",
+        projectId: "ranker-dc503",
+        storageBucket: "ranker-dc503.appspot.com",
+        messagingSenderId: "164197493785",
+        appId: "1:164197493785:web:c95f8fa6ff0b4738568e88",
+        measurementId: "G-WQ5W36HV54"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+
+      function LinkFormatter(value, row, index) {
+        return "<a href='"+row.website+"'>"+value+"</a>";
+      }
+
+      var data = [];
+      var fmtdata = [];
+      $.getJSON("https://ranker-dc503.firebaseio.com/.json", 
+         function(data){
+ 
+           var i = 0;
+           var limit = data.length - 1;        
+           for (i = 0; i < limit; i++) {
+             fmtdata.push(data[i+1]);
+           }
+
+           //console.log(fmtdata);
+           
+           $('#table').bootstrapTable({
+            data: fmtdata
+          });   
+
+      });
+    </script>
+
+<body>
+      <br>
+    <br>
+   
+    <br>
+    <br> <table id="table"
+    
+    data-toolbar="#toolbar"
+  
+    data-show-columns="true"
+  data-show-columns-toggle-all="true"
+  data-show-export="true"
+  data-click-to-select="true"
+  data-side-pagination="server"  
+  class="table table-hover"
+
+  data-height="500"
+  data-search="true"
+  data-sort-name="holistic"
+  data-sort-order="desc"
+  
+
+    >
+        <thead>
+          <tr id="tr">
+            <th data-field="name" data-sortable="true" data-formatter="LinkFormatter">Name</th>
+            <th data-field="id" data-sortable="true">Ranking</th>
+            <th data-field="foundingYear" data-sortable="true">Founding Year</th>
+            <th data-field="location" data-sortable="false">Location</th>
+            <th data-field="investments" data-sortable="true">Investments</th>
+            <th data-field="score" data-sortable="true">Score</th>
+          </tr>
+  
+        </thead>
+  
+      </table>
+
+
+
+  <!--
+    <table
+  data-toolbar="#toolbar"
+  data-show-columns="true"
+  data-show-columns-toggle-all="true"
+  data-show-export="true"
+  data-click-to-select="true"
+  data-side-pagination="server"
+
+
+    class="table table-hover"
+    data-toggle="table"
+    data-height="500"
+    data-search="true"
+    data-sort-name="holistic"
+    data-sort-order="desc"
+    id="table">
+      <thead>
+        <tr id="tr">
+          <th data-field="name" data-sortable="true" data-formatter="LinkFormatter">Name</th>
+          <th data-field="id" data-sortable="true">Ranking</th>
+          <th data-field="foundingYear" data-sortable="true">Founding Year</th>
+          <th data-field="location" data-sortable="false">Location</th>
+          <th data-field="investments" data-sortable="true">Investments</th>
+          <th data-field="score" data-sortable="true">Score</th>
+        </tr>
+
+      </thead>
+
+    </table>
+  -->
+    
+<!--
+  //     function ajaxRequest(params) {
+  //   var url = 'https://ranker-dc503.firebaseio.com/.json'
+  //   $.get(url + '?' + $.param(params.data)).then(function (res) {
+  //     params.success(res)
+  //   })
+  // }
+
+
+    // function ajaxRequest(params) {
+    //   var params = {data: "value"};
+    //   var url = 'https://ranker-dc503.firebaseio.com/.json'
+    //   $.getJSON(url, function(data) {
+    //   //params.success(res);
+    //     console.log(data);
+    //   });
+    // };
+
+//         function ajaxRequest(params) {
+//       var params = {data: "value"};
+//       var url = 'https://ranker-dc503.firebaseio.com/.json'
+//       $.post('https://ranker-dc503.firebaseio.com/.json',
+//   JSON.stringify(params),
+//   function () {
+//     alert("success");
+//   }
+// );
+//     };
+
+/*
+$(".mySelect").change(function () {
+var name     = $('#name').val();
+$.ajax({
+    url     : 'https://ranker-dc503.firebaseio.com/.json',
+    type    : 'POST',
+    dataType: 'json',
+    data    :  {name:name},
+    success: function( data ) {
+        $('#table').bootstrapTable('load', data);
+    }
+    ,
+    error: function(data){
+        alert('Error');
+        }
+    });
+});
+*/
+
+
+ //  $(document).ready(function () {
+ //   var data = {};
+
+ //   $.ajax({
+ //     url: 'https://ranker-dc503.firebaseio.com/.json',
+ //     type: "POST",
+ //     data: JSON.stringify(data),
+ //     success: function () {
+ //       alert("success");
+ //       console.log(data);
+ //     },
+ //     error: function(error) {
+ //       alert("error: "+error);
+ //     }
+ //   });
+ // });
+
+
+//  function ajaxRequest(params) {
+//     $.ajax({
+//         type: "POST",
+//         url: "https://ranker-dc503.firebaseio.com/.json",
+//         data: JSON.stringify(param),
+//         success: function (data) {
+//             console.log(data);
+//             params.success({
+//                 "rows": data,
+//                 "total": data.length
+//             },null,{});
+//         },
+//         error: function (er) {
+//             params.error(er);
+//         }
+//     });
+// }
+-->
+
+
+    <br>
+    <br>
+    <br>
+
+    <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+  </body>
+</html>

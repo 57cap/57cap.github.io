@@ -95,23 +95,21 @@
     data-side-pagination="server"  
     class="table table-hover"
     data-height="560"
-    data-search="true"
-    data-sort-name="score"
-    data-sort-order="desc">
+    data-search="true">
         <thead>
           <tr id="tr">
           <!-- Comment out any columns that users should not be able to see, such as confidential information from Pitchbook -->
-          <th data-field="id" data-sortable="true">Ranking</th>
-          <th data-field="score" data-sortable="true">Score</th>
-          <th data-field="name" data-sortable="true" data-formatter="websiteFormatter">Name</th>
-          <th data-field="foundingYear" data-sortable="true">Founding Year</th>
+          <th data-field="id" data-sortable="false">Ranking</th>
+          <th data-field="score" data-sortable="false">Score</th>
+          <th data-field="name" data-sortable="false" data-formatter="websiteFormatter">Name</th>
+          <th data-field="foundingYear" data-sortable="false">Founding Year</th>
           <th data-field="location" data-sortable="false">Location</th>
           <th data-field="description" data-sortable="false">Description</th>
-          <th data-field="portfolio" data-sortable="true">Portfolio</th>
-          <th data-field="investments" data-sortable="true">Investments</th>
-          <th data-field="leadInvestments" data-sortable="true">Lead Investments</th>
-          <th data-field="exits" data-sortable="true">Exits</th>
-          <th data-field="exitsIPO" data-sortable="true">Exits IPO</th>
+          <th data-field="portfolio" data-sortable="false">Portfolio</th>
+          <th data-field="investments" data-sortable="false">Investments</th>
+          <th data-field="leadInvestments" data-sortable="false">Lead Investments</th>
+          <th data-field="exits" data-sortable="false">Exits</th>
+          <th data-field="exitsIPO" data-sortable="false">Exits IPO</th>
           <!-- <th data-field="irr" data-sortable="true">IRR</th> -->
           <!-- <th data-field="tvpi" data-sortable="true">TVPI</th> -->
           <!-- <th data-field="dpi" data-sortable="true">DPI</th> -->
@@ -124,12 +122,12 @@
           <th data-field="employees" data-sortable="false">Employees</th>
           <th data-field="founders" data-sortable="false">Founders</th>
           <th data-field="industries" data-sortable="false">Industries</th>
-          <th data-field="articles" data-sortable="true">Article Mentions</th>
+          <th data-field="articles" data-sortable="false">Article Mentions</th>
           <!-- <th data-field="fundRounds" data-sortable="true">Total Funding Rounds</th> -->
-          <th data-field="fundStatus" data-sortable="true">Last Fund Status</th>
-          <th data-field="fundName" data-sortable="true">Latest Fund Name</th>
+          <th data-field="fundStatus" data-sortable="false">Last Fund Status</th>
+          <th data-field="fundName" data-sortable="false">Latest Fund Name</th>
           <!-- <th data-field="lastFunding" data-sortable="true">Last Funding</th> -->
-          <th data-field="totalFunding" data-sortable="true">Total Funding</th>
+          <th data-field="totalFunding" data-sortable="false">Total Funding</th>
           <!-- <th data-field="name" data-sortable="false" data-formatter="crunchbaseFormatter">Crunchbase</th> -->
           <!-- <th data-field="lastUpdated" data-sortable="true">Last Updated</th> -->
           <!-- <th data-field="raw" data-sortable="true">Raw Score</th> -->
