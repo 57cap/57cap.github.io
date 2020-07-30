@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
-
     <link rel="stylesheet" type="text/css" href="theme.css" media="all" />
-    <link rel="icon" href="logo.png" />
-  </head>
+  
 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
-  <body>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+  
+  
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
@@ -38,6 +40,7 @@
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       firebase.analytics();
+
 
       // Formats website and Crunchbase links in the table
       function websiteFormatter(value, row, index) {
@@ -65,9 +68,11 @@
            $('#table').bootstrapTable({
             data: fmtdata
           });   
+
       });
     </script>
 
+<body>
     <!-- Logo redirects to Recast Capital's website -->
     <br>
     <br>
@@ -76,25 +81,25 @@
          <img alt="logo" src="recast.jpg" width="300">
       </a>
     </div>
-  
+
     <!-- Bootstrap Table -->
     <table
     id="table"
-    data-url="export.json"
-    data-sort-name="score"
-    data-sort-order="desc"
-
-    data-toggle="table"
+    data-toolbar="#toolbar"
+    data-show-columns="true"
+    data-show-columns-toggle-all="true"
+    data-buttons-align="right"
+    data-show-fullscreen="true"
+    data-show-export="true"
+    data-click-to-select="true"
+    data-side-pagination="server"  
+    class="table table-hover"
     data-height="560"
     data-search="true"
-    data-show-columns="true"
-    data-buttons-align="right"
-    data-show-columns-toggle-all="true"
-    data-show-fullscreen="true"
-    data-pagination="false"
-    data-click-to-select="true">
-      <thead>
-        <tr id="tr">
+    data-sort-name="score"
+    data-sort-order="desc">
+        <thead>
+          <tr id="tr">
           <!-- Comment out any columns that users should not be able to see, such as confidential information from Pitchbook -->
           <th data-field="id" data-sortable="true">Ranking</th>
           <th data-field="score" data-sortable="true">Score</th>
@@ -130,8 +135,8 @@
           <!-- <th data-field="raw" data-sortable="true">Raw Score</th> -->
           <!-- <th data-field="normalized" data-sortable="true">Normalized</th> -->
         </tr>
-      </thead>
-    </table>
+        </thead>
+      </table>
 
     <br>
     <br>
@@ -139,12 +144,8 @@
 
     <p class="copyright text-muted" style="text-align:center;">Copyright &copy; Recast Capital 2020</p>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    
     
   </body>
 </html>
