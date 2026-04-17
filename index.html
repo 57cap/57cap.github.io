@@ -499,7 +499,7 @@ async function sendMessage() {
         'anthropic-dangerous-direct-browser-access':'true'
       },
       body: JSON.stringify({
-        model:'claude-3-5-sonnet-latest',
+        model:'claude-3-5-sonnet-20241022',
         max_tokens:4096,
         system:SYS,
         messages:msgs,
@@ -509,7 +509,8 @@ async function sendMessage() {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Error ${res.status}`);
+      const msg = err.error ? `${err.error.type}: ${err.error.message}` : `Error ${res.status}`;
+      throw new Error(msg);
     }
 
     const reader = res.body.getReader();
