@@ -3,222 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>AI A&R Assistant</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+  <title>AI A&R</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-chat: #16161f;
-      --bg-card: #1a1a26;
-      --bg-input: #1e1e2e;
-      --accent: #8b5cf6;
-      --accent-dim: rgba(139,92,246,0.15);
-      --accent-secondary: #f472b6;
-      --text: #f1f1f6;
-      --text-secondary: #9595ad;
-      --text-muted: #5e5e76;
-      --border: #2a2a3d;
-      --user-bg: #2d2b55;
-      --ai-bg: #1a1a26;
-      --error: #ef4444;
-      --success: #34d399;
-    }
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { height:100%; }
     body {
-      font-family:'Inter',-apple-system,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      overflow:hidden;
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:#1a1a1a;
+      color:#e8e8e8;
     }
 
-    /* Layout */
-    .app { display:flex; height:100vh; }
-    .sidebar {
-      width:280px;
-      background:var(--bg-secondary);
-      border-right:1px solid var(--border);
+    .app {
       display:flex;
       flex-direction:column;
+      height:100vh;
+      max-width:720px;
+      margin:0 auto;
+    }
+
+    /* Header */
+    .header {
+      padding:16px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       flex-shrink:0;
     }
-    .main { flex:1; display:flex; flex-direction:column; min-width:0; }
-
-    /* Sidebar */
-    .sidebar-header {
-      padding:20px;
-      border-bottom:1px solid var(--border);
-    }
-    .sidebar-header h1 {
-      font-size:18px;
-      font-weight:800;
-      background:linear-gradient(135deg,#8b5cf6,#f472b6);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-      margin-bottom:4px;
-    }
-    .sidebar-header p {
-      font-size:11px;
-      color:var(--text-muted);
-      text-transform:uppercase;
-      letter-spacing:1px;
-    }
-    .sidebar-section {
-      padding:16px 20px 8px;
-      font-size:11px;
-      font-weight:700;
-      color:var(--text-muted);
-      text-transform:uppercase;
-      letter-spacing:1px;
-    }
-    .sidebar-nav {
-      flex:1;
-      overflow-y:auto;
-      padding:0 12px;
-    }
-    .nav-item {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:8px;
-      font-size:13px;
-      color:var(--text-secondary);
-      cursor:pointer;
-      transition:all 0.15s;
-      margin-bottom:2px;
-    }
-    .nav-item:hover { background:var(--bg-card); color:var(--text); }
-    .nav-item.active { background:var(--accent-dim); color:var(--accent); }
-    .nav-item i { width:18px; text-align:center; font-size:14px; }
-
-    .new-chat-btn {
-      margin:12px;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:var(--bg-card);
-      color:var(--text);
-      font-size:13px;
+    .header-title {
+      font-size:15px;
       font-weight:600;
-      cursor:pointer;
+      color:#e8e8e8;
+    }
+    .header-actions {
       display:flex;
-      align-items:center;
-      justify-content:center;
       gap:8px;
-      transition:all 0.15s;
     }
-    .new-chat-btn:hover { border-color:var(--accent); color:var(--accent); }
-
-    /* API Key */
-    .api-key-section {
-      padding:12px;
-      border-top:1px solid var(--border);
-    }
-    .api-key-btn {
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--text-secondary);
-      font-size:12px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      transition:all 0.15s;
-    }
-    .api-key-btn:hover { border-color:var(--accent); color:var(--text); }
-    .api-key-btn.connected { border-color:var(--success); color:var(--success); }
-
-    /* Modal */
-    .modal-overlay {
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.7);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:100;
-    }
-    .modal-overlay.show { display:flex; }
-    .modal {
-      background:var(--bg-secondary);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:32px;
-      width:440px;
-      max-width:90vw;
-    }
-    .modal h2 {
-      font-size:20px;
-      font-weight:700;
-      margin-bottom:8px;
-    }
-    .modal p {
-      font-size:14px;
-      color:var(--text-secondary);
-      margin-bottom:20px;
-      line-height:1.5;
-    }
-    .modal input {
-      width:100%;
-      padding:12px 16px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:var(--bg-input);
-      color:var(--text);
-      font-size:14px;
-      font-family:monospace;
-      outline:none;
-      margin-bottom:16px;
-    }
-    .modal input:focus { border-color:var(--accent); }
-    .modal-actions {
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-    }
-    .btn-secondary {
-      padding:10px 20px;
-      border-radius:8px;
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--text-secondary);
-      font-size:13px;
-      font-weight:600;
-      cursor:pointer;
-    }
-    .btn-primary {
-      padding:10px 20px;
-      border-radius:8px;
+    .header-btn {
+      background:none;
       border:none;
-      background:var(--accent);
-      color:#fff;
+      color:#666;
       font-size:13px;
-      font-weight:600;
       cursor:pointer;
+      padding:6px 12px;
+      border-radius:6px;
+      transition:all 0.15s;
+      font-family:inherit;
     }
-    .btn-primary:hover { opacity:0.9; }
+    .header-btn:hover { color:#e8e8e8; background:#2a2a2a; }
+    .header-btn.connected { color:#5cb85c; }
 
-    /* Chat area */
-    .chat-container {
+    /* Chat */
+    .chat {
       flex:1;
       overflow-y:auto;
-      padding:20px 0;
-      scroll-behavior:smooth;
-    }
-    .chat-inner {
-      max-width:760px;
-      margin:0 auto;
       padding:0 24px;
     }
 
-    /* Welcome screen */
+    /* Welcome */
     .welcome {
       display:flex;
       flex-direction:column;
@@ -226,644 +68,491 @@
       justify-content:center;
       height:100%;
       text-align:center;
-      padding:40px 24px;
-    }
-    .welcome-icon {
-      font-size:48px;
-      margin-bottom:24px;
-      background:linear-gradient(135deg,#8b5cf6,#f472b6);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
+      padding:40px 20px;
     }
     .welcome h2 {
-      font-size:28px;
-      font-weight:800;
-      margin-bottom:12px;
+      font-size:22px;
+      font-weight:600;
+      margin-bottom:8px;
+      color:#e8e8e8;
     }
     .welcome p {
-      font-size:16px;
-      color:var(--text-secondary);
-      max-width:500px;
-      margin-bottom:36px;
+      font-size:14px;
+      color:#888;
+      max-width:400px;
       line-height:1.6;
+      margin-bottom:32px;
     }
     .starters {
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:12px;
-      max-width:560px;
+      gap:8px;
+      max-width:480px;
       width:100%;
     }
+    @media(max-width:500px) { .starters { grid-template-columns:1fr; } }
     .starter {
-      background:var(--bg-card);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:16px;
+      padding:14px 16px;
+      border:1px solid #2a2a2a;
+      border-radius:10px;
       text-align:left;
       cursor:pointer;
       transition:all 0.15s;
+      background:transparent;
     }
-    .starter:hover { border-color:var(--accent); background:var(--bg-input); }
+    .starter:hover { border-color:#444; background:#222; }
     .starter-title {
       font-size:13px;
-      font-weight:600;
-      color:var(--text);
-      margin-bottom:4px;
+      font-weight:500;
+      color:#e8e8e8;
+      margin-bottom:2px;
     }
     .starter-desc {
       font-size:12px;
-      color:var(--text-muted);
-      line-height:1.4;
+      color:#666;
     }
 
     /* Messages */
     .message {
-      display:flex;
-      gap:16px;
-      margin-bottom:24px;
-      animation:fadeIn 0.3s ease;
+      padding:20px 0;
+      animation:fadeIn 0.2s ease;
     }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-    .message-avatar {
-      width:32px;
-      height:32px;
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-shrink:0;
-      font-size:14px;
-      margin-top:2px;
+    .message + .message {
+      border-top:1px solid #222;
     }
-    .msg-user .message-avatar { background:var(--user-bg); color:#a5b4fc; }
-    .msg-ai .message-avatar { background:linear-gradient(135deg,#8b5cf6,#f472b6); color:#fff; }
-    .message-content {
-      flex:1;
-      min-width:0;
-    }
-    .message-role {
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .msg-role {
       font-size:12px;
-      font-weight:700;
-      margin-bottom:6px;
-      text-transform:uppercase;
-      letter-spacing:0.5px;
+      font-weight:600;
+      margin-bottom:8px;
+      color:#888;
     }
-    .msg-user .message-role { color:var(--text-muted); }
-    .msg-ai .message-role { color:var(--accent); }
-    .message-text {
+    .msg-ai .msg-role { color:#c4a1ff; }
+    .msg-text {
       font-size:15px;
-      line-height:1.7;
-      color:var(--text-secondary);
+      line-height:1.75;
+      color:#ccc;
     }
-    .message-text p { margin-bottom:12px; }
-    .message-text p:last-child { margin-bottom:0; }
-    .message-text strong { color:var(--text); font-weight:600; }
-    .message-text em { color:var(--accent-secondary); }
-    .message-text ul, .message-text ol { margin:8px 0 12px 20px; }
-    .message-text li { margin-bottom:4px; }
-    .message-text code {
-      background:var(--bg-input);
+    .msg-user .msg-text { color:#e8e8e8; }
+    .msg-text p { margin-bottom:12px; }
+    .msg-text p:last-child { margin-bottom:0; }
+    .msg-text strong { color:#e8e8e8; font-weight:600; }
+    .msg-text em { color:#c4a1ff; font-style:normal; }
+    .msg-text ul, .msg-text ol { margin:8px 0 12px 20px; }
+    .msg-text li { margin-bottom:6px; }
+    .msg-text code {
+      background:#2a2a2a;
       padding:2px 6px;
       border-radius:4px;
       font-size:13px;
     }
-    .message-text blockquote {
-      border-left:3px solid var(--accent);
+    .msg-text blockquote {
+      border-left:2px solid #444;
       padding-left:16px;
       margin:12px 0;
-      color:var(--text-muted);
-      font-style:italic;
+      color:#888;
     }
-    .msg-user .message-text { color:var(--text); }
 
-    .typing-indicator {
-      display:inline-flex;
-      gap:4px;
-      padding:4px 0;
-    }
-    .typing-indicator span {
-      width:6px;
-      height:6px;
+    .typing span {
+      display:inline-block;
+      width:5px;
+      height:5px;
       border-radius:50%;
-      background:var(--text-muted);
-      animation:typing 1.4s infinite;
+      background:#666;
+      margin-right:4px;
+      animation:blink 1.4s infinite;
     }
-    .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
-    @keyframes typing {
-      0%,60%,100% { opacity:0.3; transform:translateY(0); }
-      30% { opacity:1; transform:translateY(-4px); }
+    .typing span:nth-child(2) { animation-delay:0.2s; }
+    .typing span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes blink {
+      0%,60%,100%{opacity:.3} 30%{opacity:1}
+    }
+
+    .error-msg {
+      padding:12px 16px;
+      border-radius:8px;
+      font-size:13px;
+      color:#ef4444;
+      background:#1f1010;
+      margin:12px 0;
     }
 
     /* Input */
     .input-area {
-      padding:16px 24px 24px;
-      background:var(--bg);
-    }
-    .input-wrapper {
-      max-width:760px;
-      margin:0 auto;
-      position:relative;
+      padding:12px 24px 24px;
+      flex-shrink:0;
     }
     .input-box {
       display:flex;
       align-items:flex-end;
-      background:var(--bg-input);
-      border:1px solid var(--border);
-      border-radius:14px;
+      border:1px solid #333;
+      border-radius:12px;
       padding:4px;
       transition:border-color 0.15s;
+      background:#222;
     }
-    .input-box:focus-within { border-color:var(--accent); }
+    .input-box:focus-within { border-color:#555; }
     .input-box textarea {
       flex:1;
       background:transparent;
       border:none;
-      color:var(--text);
+      color:#e8e8e8;
       font-size:15px;
-      font-family:'Inter',-apple-system,sans-serif;
-      padding:12px 16px;
+      font-family:inherit;
+      padding:10px 12px;
       resize:none;
       outline:none;
-      max-height:150px;
+      max-height:120px;
       line-height:1.5;
     }
-    .input-box textarea::placeholder { color:var(--text-muted); }
+    .input-box textarea::placeholder { color:#555; }
     .send-btn {
-      width:40px;
-      height:40px;
-      border-radius:10px;
+      width:36px;
+      height:36px;
+      border-radius:8px;
       border:none;
-      background:var(--accent);
-      color:#fff;
+      background:#e8e8e8;
+      color:#1a1a1a;
       cursor:pointer;
       display:flex;
       align-items:center;
       justify-content:center;
       flex-shrink:0;
-      margin:4px;
+      margin:2px;
       transition:opacity 0.15s;
+      font-size:16px;
     }
-    .send-btn:disabled { opacity:0.3; cursor:not-allowed; }
-    .send-btn:not(:disabled):hover { opacity:0.9; }
-    .input-hint {
-      text-align:center;
-      font-size:11px;
-      color:var(--text-muted);
-      margin-top:8px;
-    }
+    .send-btn:disabled { opacity:0.15; cursor:default; }
+    .send-btn:not(:disabled):hover { opacity:0.8; }
 
-    .error-msg {
-      background:rgba(239,68,68,0.1);
-      border:1px solid rgba(239,68,68,0.3);
-      border-radius:10px;
-      padding:12px 16px;
-      font-size:13px;
-      color:var(--error);
-      margin-bottom:24px;
-    }
-
-    /* Mobile */
-    .menu-toggle {
-      display:none;
+    /* Modal */
+    .modal-bg {
       position:fixed;
-      top:16px;
-      left:16px;
-      z-index:50;
-      width:40px;
-      height:40px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:var(--bg-secondary);
-      color:var(--text);
-      font-size:18px;
-      cursor:pointer;
+      inset:0;
+      background:rgba(0,0,0,0.6);
+      display:none;
       align-items:center;
       justify-content:center;
+      z-index:100;
     }
-    @media(max-width:768px) {
-      .menu-toggle { display:flex; }
-      .sidebar {
-        position:fixed;
-        left:-280px;
-        top:0;
-        bottom:0;
-        z-index:40;
-        transition:left 0.2s;
-      }
-      .sidebar.open { left:0; }
-      .starters { grid-template-columns:1fr; }
+    .modal-bg.show { display:flex; }
+    .modal {
+      background:#222;
+      border:1px solid #333;
+      border-radius:12px;
+      padding:28px;
+      width:400px;
+      max-width:90vw;
+    }
+    .modal h2 { font-size:16px; font-weight:600; margin-bottom:6px; }
+    .modal p { font-size:13px; color:#888; margin-bottom:16px; line-height:1.5; }
+    .modal input {
+      width:100%;
+      padding:10px 14px;
+      border-radius:8px;
+      border:1px solid #333;
+      background:#1a1a1a;
+      color:#e8e8e8;
+      font-size:14px;
+      font-family:monospace;
+      outline:none;
+      margin-bottom:14px;
+    }
+    .modal input:focus { border-color:#555; }
+    .modal-btns { display:flex; gap:8px; justify-content:flex-end; }
+    .btn-cancel {
+      padding:8px 16px;
+      border-radius:6px;
+      border:1px solid #333;
+      background:transparent;
+      color:#888;
+      font-size:13px;
+      cursor:pointer;
+      font-family:inherit;
+    }
+    .btn-save {
+      padding:8px 16px;
+      border-radius:6px;
+      border:none;
+      background:#e8e8e8;
+      color:#1a1a1a;
+      font-size:13px;
+      font-weight:500;
+      cursor:pointer;
+      font-family:inherit;
     }
   </style>
 </head>
 <body>
 
-  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">
-    <i class="fas fa-bars"></i>
-  </button>
+<div class="app">
+  <div class="header">
+    <div class="header-title">AI A&R</div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="newChat()">New chat</button>
+      <button class="header-btn" id="keyBtn" onclick="showModal()">API key</button>
+    </div>
+  </div>
 
-  <div class="app">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <h1>AI A&R</h1>
-        <p>Artist Development Assistant</p>
-      </div>
-
-      <div class="sidebar-section">A&R Modes</div>
-      <nav class="sidebar-nav">
-        <div class="nav-item active" data-mode="general" onclick="setMode(this)">
-          <i class="fas fa-comments"></i> General A&R Chat
+  <div class="chat" id="chat">
+    <div id="welcome" class="welcome">
+      <h2>Your AI A&R</h2>
+      <p>Honest, direct feedback on your music. Artist development, song selection, release strategy — like having an A&R in your pocket.</p>
+      <div class="starters">
+        <div class="starter" onclick="send('I\'m an independent artist trying to define my sound. I blend [genre] with [genre]. Help me figure out my positioning.')">
+          <div class="starter-title">Define my sound</div>
+          <div class="starter-desc">Find your lane and positioning</div>
         </div>
-        <div class="nav-item" data-mode="identity" onclick="setMode(this)">
-          <i class="fas fa-fingerprint"></i> Artist Identity
+        <div class="starter" onclick="send('I have 5 songs recorded. How do I decide which one to push as my single?')">
+          <div class="starter-title">Pick my single</div>
+          <div class="starter-desc">Choose your focus record</div>
         </div>
-        <div class="nav-item" data-mode="songs" onclick="setMode(this)">
-          <i class="fas fa-music"></i> Song Selection
+        <div class="starter" onclick="send('I\'m about to drop a new song. Help me build a rollout plan.')">
+          <div class="starter-title">Release strategy</div>
+          <div class="starter-desc">Plan your next rollout</div>
         </div>
-        <div class="nav-item" data-mode="team" onclick="setMode(this)">
-          <i class="fas fa-users"></i> Team Building
-        </div>
-        <div class="nav-item" data-mode="feedback" onclick="setMode(this)">
-          <i class="fas fa-headphones-alt"></i> Music Feedback
-        </div>
-        <div class="nav-item" data-mode="focus" onclick="setMode(this)">
-          <i class="fas fa-bullseye"></i> Focus Record
-        </div>
-        <div class="nav-item" data-mode="release" onclick="setMode(this)">
-          <i class="fas fa-calendar-alt"></i> Release Strategy
-        </div>
-        <div class="nav-item" data-mode="distribute" onclick="setMode(this)">
-          <i class="fas fa-globe"></i> Distribution
-        </div>
-        <div class="nav-item" data-mode="analytics" onclick="setMode(this)">
-          <i class="fas fa-chart-line"></i> Performance Analytics
-        </div>
-        <div class="nav-item" data-mode="pivot" onclick="setMode(this)">
-          <i class="fas fa-rocket"></i> Double Down or Pivot
-        </div>
-      </nav>
-
-      <button class="new-chat-btn" onclick="newChat()">
-        <i class="fas fa-plus"></i> New Conversation
-      </button>
-
-      <div class="api-key-section">
-        <button class="api-key-btn" id="apiKeyBtn" onclick="showApiKeyModal()">
-          <i class="fas fa-key"></i>
-          <span id="apiKeyStatus">Set API Key</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <div class="main">
-      <div class="chat-container" id="chatContainer">
-        <div class="chat-inner" id="chatInner">
-          <!-- Welcome -->
-          <div class="welcome" id="welcome">
-            <div class="welcome-icon"><i class="fas fa-microphone-alt"></i></div>
-            <h2>Your AI A&R</h2>
-            <p>I'm your personal A&R assistant. I'll give you honest, direct feedback on your music, help you find your sound, build your team, and plan your releases.</p>
-            <div class="starters">
-              <div class="starter" onclick="sendStarter('I\'m an independent artist trying to define my sound. I make music that blends [genre] with [genre]. Can you help me figure out my positioning?')">
-                <div class="starter-title">Define my sound</div>
-                <div class="starter-desc">Get help finding your lane and positioning</div>
-              </div>
-              <div class="starter" onclick="sendStarter('I have 5 songs recorded. How should I decide which one to push as my focus record?')">
-                <div class="starter-title">Pick my single</div>
-                <div class="starter-desc">Figure out which song to push hardest</div>
-              </div>
-              <div class="starter" onclick="sendStarter('I\'m about to release a new song. Help me build a rollout plan — what should I post, when, and where?')">
-                <div class="starter-title">Release strategy</div>
-                <div class="starter-desc">Build a rollout plan for your next drop</div>
-              </div>
-              <div class="starter" onclick="sendStarter('Be honest with me — what are the biggest mistakes independent artists make, and how do I avoid them?')">
-                <div class="starter-title">Real talk</div>
-                <div class="starter-desc">Get brutally honest industry advice</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Input -->
-      <div class="input-area">
-        <div class="input-wrapper">
-          <div class="input-box">
-            <textarea id="userInput" rows="1" placeholder="Talk to your A&R..." onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
-              <i class="fas fa-arrow-up"></i>
-            </button>
-          </div>
-          <div class="input-hint">Press Enter to send, Shift+Enter for new line</div>
+        <div class="starter" onclick="send('Be real with me — what mistakes do independent artists keep making?')">
+          <div class="starter-title">Real talk</div>
+          <div class="starter-desc">Brutally honest industry advice</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- API Key Modal -->
-  <div class="modal-overlay" id="apiKeyModal">
-    <div class="modal">
-      <h2>Connect to Claude</h2>
-      <p>Enter your Anthropic API key. It's stored in your browser only and sent directly to Anthropic's API — never to any other server.</p>
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveApiKey()">
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeApiKeyModal()">Cancel</button>
-        <button class="btn-primary" onclick="saveApiKey()">Save Key</button>
-      </div>
+  <div class="input-area">
+    <div class="input-box">
+      <textarea id="input" rows="1" placeholder="Message your A&R..." onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>&#8593;</button>
     </div>
   </div>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>API key</h2>
+    <p>Your key is stored in this browser only and sent directly to Anthropic.</p>
+    <input type="password" id="keyInput" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveKey()">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="hideModal()">Cancel</button>
+      <button class="btn-save" onclick="saveKey()">Save</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const SYSTEM_PROMPT = `You are an elite A&R (Artists & Repertoire) executive with 20+ years of experience developing artists from unknown to superstar status. You've worked across hip-hop, R&B, pop, electronic, rock, and Latin music. You combine deep music industry knowledge with sharp creative instincts.
+const SYS = `You are an elite A&R (Artists & Repertoire) executive with 20+ years developing artists from unknown to superstar. You've worked across hip-hop, R&B, pop, electronic, rock, and Latin music.
 
 Your personality:
-- DIRECT and HONEST — you don't sugarcoat. If something isn't working, you say it clearly but constructively.
-- You think like a strategist, not just a music fan. Every suggestion ties back to career growth.
+- DIRECT and HONEST. You don't sugarcoat. If something isn't working, you say it clearly but constructively.
+- You think like a strategist. Every suggestion ties back to career growth.
 - You balance taste with data. You trust your ear but validate with market reality.
-- You're encouraging but never fake. You celebrate what's genuinely strong.
-- You speak conversationally, like a mentor in a studio session — not like a corporate exec.
+- You're encouraging but never fake.
+- You speak conversationally, like a mentor in a studio session.
 
-Your expertise covers the full A&R framework:
+Your expertise covers:
+1. ARTIST IDENTITY — Sound, lane, positioning, story. What makes them different.
+2. SONG SELECTION — Hooks, structure, replay value, emotional impact, commercial potential.
+3. TEAM BUILDING — Producers, writers, engineers. Chemistry > résumé.
+4. MUSIC FEEDBACK — Melody, energy, pacing, arrangement, production, lyrics, delivery.
+5. FOCUS RECORD — Picking THE ONE song to push. The #1 indie mistake is no focus.
+6. RELEASE STRATEGY — Timing, content cadence, snippets, visuals, playlists, social.
+7. DISTRIBUTION — Platforms, metadata, promotion.
+8. PERFORMANCE ANALYTICS — Streams, saves, skip rates, growth. Which metrics matter.
+9. DOUBLE DOWN OR PIVOT — Breakout signals, when to push harder vs. try something new.
 
-1. ARTIST IDENTITY — Helping artists define their sound, lane, positioning, and story. You can compare them to reference artists and identify what makes them different.
-
-2. SONG SELECTION — Evaluating songs based on hooks, structure, replay value, emotional impact, and commercial potential. You know the difference between "sounds like a hit" and "IS a hit."
-
-3. TEAM BUILDING — Advising on producers, writers, engineers, vocal coaches. You know that chemistry > résumé and can help artists think about who to work with.
-
-4. MUSIC FEEDBACK — Giving structured creative feedback on melody, energy, pacing, arrangement, production, lyrics, and delivery. You reference comparable songs to illustrate points.
-
-5. FOCUS RECORD — Helping artists pick THE ONE song to push. You understand that the #1 independent mistake is dropping too many songs with no focus.
-
-6. RELEASE STRATEGY — Planning rollouts: timing, content cadence, snippets, visuals, playlist pitching, social media strategy.
-
-7. DISTRIBUTION — Advising on platforms (DistroKid, TuneCore, UnitedMasters), metadata optimization, and promotion tactics.
-
-8. PERFORMANCE ANALYTICS — Interpreting streams, saves, skip rates, audience growth, and playlist placements. You know which metrics actually matter.
-
-9. DOUBLE DOWN OR PIVOT — Identifying breakout signals, knowing when to push harder vs. when to try something new. You help artists not abandon songs too early.
-
-Key principles you always follow:
+Principles:
 - "Create a lot → Filter aggressively → Pick 1 → Push it hard → Learn → Repeat"
-- Independent A&R = being brutally honest with your own music while using data to remove guesswork
-- You always ask clarifying questions before giving advice — you need to understand the artist's specific situation
-- You give actionable advice, not vague platitudes
-- You warn against common independent artist mistakes: releasing too much, not refining enough, not committing to a direction, relying on friends' opinions instead of real filtering
-- When discussing songs, you think about: Would I skip this in the first 10 seconds? Does the hook stick after one listen? Would someone add this to a playlist?
+- Ask clarifying questions before giving advice
+- Give actionable advice, not vague platitudes
+- Warn against: releasing too much, not refining enough, not committing, relying on friends' opinions
+- Think: Would I skip this in 10 seconds? Does the hook stick? Would someone playlist this?
 
-Format your responses with clear structure when appropriate — use bold for key points, bullet lists for action items, and keep paragraphs short. But stay conversational, not robotic.`;
+Keep responses focused. Use bold for key points, bullets for actions. Stay conversational.`;
 
-let messages = [];
-let apiKey = localStorage.getItem('anthropic_api_key') || '';
-let currentMode = 'general';
-let isStreaming = false;
+let msgs = [];
+let key = localStorage.getItem('ak') || '';
+let busy = false;
 
 function init() {
-  updateApiKeyUI();
-  document.getElementById('userInput').focus();
+  if (key) document.getElementById('keyBtn').classList.add('connected');
+  document.getElementById('input').focus();
 }
 
-function updateApiKeyUI() {
-  const btn = document.getElementById('apiKeyBtn');
-  const status = document.getElementById('apiKeyStatus');
-  if (apiKey) {
-    btn.classList.add('connected');
-    status.textContent = 'API Key Connected';
-  } else {
-    btn.classList.remove('connected');
-    status.textContent = 'Set API Key';
+function showModal() {
+  document.getElementById('modal').classList.add('show');
+  const ki = document.getElementById('keyInput');
+  ki.value = key;
+  ki.focus();
+}
+function hideModal() { document.getElementById('modal').classList.remove('show'); }
+function saveKey() {
+  const k = document.getElementById('keyInput').value.trim();
+  if (k) {
+    key = k;
+    localStorage.setItem('ak', k);
+    document.getElementById('keyBtn').classList.add('connected');
+    hideModal();
   }
-}
-
-function showApiKeyModal() {
-  document.getElementById('apiKeyModal').classList.add('show');
-  document.getElementById('apiKeyInput').value = apiKey;
-  document.getElementById('apiKeyInput').focus();
-}
-
-function closeApiKeyModal() {
-  document.getElementById('apiKeyModal').classList.remove('show');
-}
-
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (key) {
-    apiKey = key;
-    localStorage.setItem('anthropic_api_key', key);
-    updateApiKeyUI();
-    closeApiKeyModal();
-  }
-}
-
-function setMode(el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-  currentMode = el.dataset.mode;
-  document.querySelector('.sidebar').classList.remove('open');
 }
 
 function newChat() {
-  messages = [];
-  document.getElementById('chatInner').innerHTML = '';
-  document.getElementById('welcome').style.display = '';
-  const welcome = document.querySelector('.welcome');
-  if (!document.getElementById('welcome')) {
-    location.reload();
-  }
-  document.querySelector('.sidebar').classList.remove('open');
+  msgs = [];
+  document.getElementById('chat').innerHTML = `<div id="welcome" class="welcome">
+    <h2>Your AI A&R</h2>
+    <p>Honest, direct feedback on your music. Artist development, song selection, release strategy — like having an A&R in your pocket.</p>
+    <div class="starters">
+      <div class="starter" onclick="send('I\\'m an independent artist trying to define my sound. I blend [genre] with [genre]. Help me figure out my positioning.')"><div class="starter-title">Define my sound</div><div class="starter-desc">Find your lane and positioning</div></div>
+      <div class="starter" onclick="send('I have 5 songs recorded. How do I decide which one to push as my single?')"><div class="starter-title">Pick my single</div><div class="starter-desc">Choose your focus record</div></div>
+      <div class="starter" onclick="send('I\\'m about to drop a new song. Help me build a rollout plan.')"><div class="starter-title">Release strategy</div><div class="starter-desc">Plan your next rollout</div></div>
+      <div class="starter" onclick="send('Be real with me — what mistakes do independent artists keep making?')"><div class="starter-title">Real talk</div><div class="starter-desc">Brutally honest industry advice</div></div>
+    </div></div>`;
 }
 
-function autoGrow(el) {
+function grow(el) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   document.getElementById('sendBtn').disabled = !el.value.trim();
 }
 
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    if (!isStreaming && document.getElementById('userInput').value.trim()) {
-      sendMessage();
-    }
+    if (!busy && document.getElementById('input').value.trim()) sendMessage();
   }
 }
 
-function sendStarter(text) {
-  document.getElementById('userInput').value = text;
-  autoGrow(document.getElementById('userInput'));
+function send(text) {
+  document.getElementById('input').value = text;
+  grow(document.getElementById('input'));
   sendMessage();
 }
 
-function addMessage(role, content) {
-  const welcome = document.getElementById('welcome');
-  if (welcome) welcome.style.display = 'none';
-
-  const chatInner = document.getElementById('chatInner');
-  const div = document.createElement('div');
-  div.className = `message msg-${role}`;
-
-  const avatarIcon = role === 'user' ? 'fa-user' : 'fa-microphone-alt';
-  const roleName = role === 'user' ? 'You' : 'A&R';
-
-  div.innerHTML = `
-    <div class="message-avatar"><i class="fas ${avatarIcon}"></i></div>
-    <div class="message-content">
-      <div class="message-role">${roleName}</div>
-      <div class="message-text">${formatMarkdown(content)}</div>
-    </div>`;
-
-  chatInner.appendChild(div);
-  scrollToBottom();
-  return div;
+function addMsg(role, content) {
+  const w = document.getElementById('welcome');
+  if (w) w.remove();
+  const d = document.createElement('div');
+  d.className = `message msg-${role}`;
+  d.innerHTML = `<div class="msg-role">${role === 'user' ? 'You' : 'A&R'}</div><div class="msg-text">${fmt(content)}</div>`;
+  document.getElementById('chat').appendChild(d);
+  scroll();
+  return d;
 }
 
-function addTypingIndicator() {
-  const welcome = document.getElementById('welcome');
-  if (welcome) welcome.style.display = 'none';
-
-  const chatInner = document.getElementById('chatInner');
-  const div = document.createElement('div');
-  div.className = 'message msg-ai';
-  div.id = 'typingMsg';
-  div.innerHTML = `
-    <div class="message-avatar"><i class="fas fa-microphone-alt"></i></div>
-    <div class="message-content">
-      <div class="message-role">A&R</div>
-      <div class="message-text"><div class="typing-indicator"><span></span><span></span><span></span></div></div>
-    </div>`;
-  chatInner.appendChild(div);
-  scrollToBottom();
-  return div;
+function addTyping() {
+  const w = document.getElementById('welcome');
+  if (w) w.remove();
+  const d = document.createElement('div');
+  d.className = 'message msg-ai';
+  d.id = 'typing';
+  d.innerHTML = `<div class="msg-role">A&R</div><div class="msg-text"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  document.getElementById('chat').appendChild(d);
+  scroll();
+  return d;
 }
 
-function updateStreamingMessage(div, content) {
-  const textEl = div.querySelector('.message-text');
-  textEl.innerHTML = formatMarkdown(content);
-  scrollToBottom();
+function scroll() {
+  const c = document.getElementById('chat');
+  c.scrollTop = c.scrollHeight;
 }
 
-function scrollToBottom() {
-  const container = document.getElementById('chatContainer');
-  container.scrollTop = container.scrollHeight;
-}
-
-function formatMarkdown(text) {
-  let html = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^### (.+)$/gm, '<strong style="font-size:15px;display:block;margin:16px 0 8px;">$1</strong>')
-    .replace(/^## (.+)$/gm, '<strong style="font-size:17px;display:block;margin:16px 0 8px;">$1</strong>')
-    .replace(/^# (.+)$/gm, '<strong style="font-size:19px;display:block;margin:16px 0 8px;">$1</strong>');
-
-  // Lists
-  html = html.replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>');
-  html = html.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>');
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-
-  // Paragraphs
-  html = html.replace(/\n\n/g, '</p><p>');
-  html = '<p>' + html + '</p>';
-  html = html.replace(/<p><\/p>/g, '');
-
-  return html;
+function fmt(t) {
+  let h = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^## (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^# (.+)$/gm,'<strong>$1</strong>');
+  h = h.replace(/^[•\-\*] (.+)$/gm,'<li>$1</li>');
+  h = h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  h = h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
+  h = h.replace(/\n\n/g,'</p><p>');
+  h = '<p>' + h + '</p>';
+  h = h.replace(/<p><\/p>/g,'');
+  return h;
 }
 
 async function sendMessage() {
-  const input = document.getElementById('userInput');
-  const text = input.value.trim();
-  if (!text || isStreaming) return;
+  const inp = document.getElementById('input');
+  const text = inp.value.trim();
+  if (!text || busy) return;
+  if (!key) { showModal(); return; }
 
-  if (!apiKey) {
-    showApiKeyModal();
-    return;
-  }
-
-  input.value = '';
-  input.style.height = 'auto';
+  inp.value = '';
+  inp.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
-  isStreaming = true;
+  busy = true;
 
-  addMessage('user', text);
-  messages.push({ role: 'user', content: text });
-
-  const typingDiv = addTypingIndicator();
-  let fullResponse = '';
+  addMsg('user', text);
+  msgs.push({ role:'user', content:text });
+  const td = addTyping();
+  let full = '';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: SYSTEM_PROMPT,
-        messages: messages,
-        stream: true
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4096,
+        system:SYS,
+        messages:msgs,
+        stream:true
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API error: ${response.status}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Error ${res.status}`);
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
+      buf += dec.decode(value, { stream:true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
       for (const line of lines) {
         if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') continue;
+          const d = line.slice(6);
+          if (d === '[DONE]') continue;
           try {
-            const parsed = JSON.parse(data);
-            if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-              fullResponse += parsed.delta.text;
-              updateStreamingMessage(typingDiv, fullResponse);
+            const p = JSON.parse(d);
+            if (p.type === 'content_block_delta' && p.delta?.text) {
+              full += p.delta.text;
+              td.querySelector('.msg-text').innerHTML = fmt(full);
+              scroll();
             }
           } catch(e) {}
         }
       }
     }
-
-    messages.push({ role: 'assistant', content: fullResponse });
-
-  } catch (err) {
-    typingDiv.remove();
-    const chatInner = document.getElementById('chatInner');
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-msg';
-    errorDiv.textContent = err.message;
-    chatInner.appendChild(errorDiv);
-    messages.pop();
-    scrollToBottom();
+    msgs.push({ role:'assistant', content:full });
+  } catch(err) {
+    td.remove();
+    const ed = document.createElement('div');
+    ed.className = 'error-msg';
+    ed.textContent = err.message;
+    document.getElementById('chat').appendChild(ed);
+    msgs.pop();
+    scroll();
   }
 
-  isStreaming = false;
-  input.focus();
+  busy = false;
+  inp.focus();
 }
 
 init();
 </script>
-
 </body>
 </html>
