@@ -490,6 +490,22 @@
     <div id="welcome" class="welcome">
       <h2>SESH</h2>
       <p>Drop your song and get honest feedback — what's working, what's not, and exactly what to fix. No music degree needed.</p>
+      <div id="langPicker" style="margin-bottom:20px;display:none;">
+        <p style="font-size:12px;color:#888;margin-bottom:8px;">Respond in:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:400px;">
+          <button class="starter" onclick="setLang('en')" style="padding:8px 14px;flex:0;white-space:nowrap;">English</button>
+          <button class="starter" onclick="setLang('es')" style="padding:8px 14px;flex:0;white-space:nowrap;">Español</button>
+          <button class="starter" onclick="setLang('pt')" style="padding:8px 14px;flex:0;white-space:nowrap;">Português</button>
+          <button class="starter" onclick="setLang('fr')" style="padding:8px 14px;flex:0;white-space:nowrap;">Français</button>
+          <button class="starter" onclick="setLang('de')" style="padding:8px 14px;flex:0;white-space:nowrap;">Deutsch</button>
+          <button class="starter" onclick="setLang('it')" style="padding:8px 14px;flex:0;white-space:nowrap;">Italiano</button>
+          <button class="starter" onclick="setLang('ja')" style="padding:8px 14px;flex:0;white-space:nowrap;">日本語</button>
+          <button class="starter" onclick="setLang('ko')" style="padding:8px 14px;flex:0;white-space:nowrap;">한국어</button>
+          <button class="starter" onclick="setLang('ar')" style="padding:8px 14px;flex:0;white-space:nowrap;">العربية</button>
+          <button class="starter" onclick="setLang('hi')" style="padding:8px 14px;flex:0;white-space:nowrap;">हिन्दी</button>
+          <button class="starter" onclick="setLang('zh')" style="padding:8px 14px;flex:0;white-space:nowrap;">中文</button>
+        </div>
+      </div>
       <div class="starters">
         <div class="starter" onclick="send('I have 5 songs recorded. Which one should I push as my single?')">
           <div class="starter-title">Pick my single</div>
@@ -664,6 +680,20 @@ var acrHost = 'identify-us-west-2.acrcloud.com';
 var acrKey = '11a2d59c643bd02088f1a48b487fe686';
 var acrSecret = '3Tn5OegOlehPztwnbc02JUy9VLb6MaWupF2lwpGp';
 let busy = false;
+var userLang = localStorage.getItem('sesh_lang') || '';
+
+function setLang(code) {
+  userLang = code;
+  localStorage.setItem('sesh_lang', code);
+  var lp = document.getElementById('langPicker');
+  if (lp) lp.style.display = 'none';
+}
+
+function getLangInstruction() {
+  if (!userLang || userLang === 'en') return '';
+  var names = { es:'Spanish', pt:'Portuguese', fr:'French', de:'German', it:'Italian', ja:'Japanese', ko:'Korean', ar:'Arabic', hi:'Hindi', zh:'Chinese' };
+  return '\n\nIMPORTANT: Respond ENTIRELY in ' + (names[userLang] || userLang) + '. All feedback, descriptions, and suggestions must be in ' + (names[userLang] || userLang) + '. Only keep song titles, artist names, and lyrics in their original language.';
+}
 let audioCtx = null;
 let uploadedAudioBuf = null;
 let currentSource = null;
@@ -718,6 +748,11 @@ function init() {
   document.getElementById('input').focus();
   setupDragDrop();
   unlockAudio();
+  // Show language picker on first visit
+  if (!userLang) {
+    var lp = document.getElementById('langPicker');
+    if (lp) lp.style.display = 'block';
+  }
 }
 
 // Unlock AudioContext on first user gesture (required by iOS/Safari)
@@ -2937,7 +2972,7 @@ function findPreviousVersion(name) {
 // ---- API ----
 
 async function callAPI(messages, useTrackMode) {
-  var sysPrompt = useTrackMode ? SYS + SYS_TRACK_ADDENDUM : SYS;
+  var sysPrompt = (useTrackMode ? SYS + SYS_TRACK_ADDENDUM : SYS) + getLangInstruction();
   var maxTok = useTrackMode ? 8192 : 4096;
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST',
