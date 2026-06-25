@@ -482,7 +482,7 @@
     <div class="header-actions">
       <button class="header-btn" onclick="toggleHistory()">History</button>
       <button class="header-btn" onclick="newChat()">New chat</button>
-      <button class="header-btn" id="keyBtn" onclick="showModal()">API key</button>
+      <button class="header-btn" onclick="showModal()">Settings</button>
     </div>
   </div>
 
@@ -603,19 +603,26 @@
 
 <div class="modal-bg" id="modal">
   <div class="modal">
-    <h2>API keys</h2>
-    <p style="margin-bottom:10px;"><strong style="color:#e8e8e8;">Anthropic key</strong> — powers SESH's analysis brain.</p>
-    <input type="password" id="keyInput" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveKey()">
-    <p style="margin-bottom:10px;margin-top:4px;"><strong style="color:#e8e8e8;">ElevenLabs key</strong> — lets SESH actually hear &amp; transcribe your lyrics. <span style="color:#666;">(optional but recommended)</span></p>
+    <h2>Settings</h2>
+    <p style="margin-bottom:10px;"><strong style="color:#e8e8e8;">ElevenLabs key</strong> — enables lyrics transcription. <span style="color:#666;">(optional — improves analysis)</span></p>
     <input type="password" id="elKeyInput" placeholder="ElevenLabs API key..." onkeydown="if(event.key==='Enter')saveKey()">
-    <p style="margin-bottom:10px;margin-top:4px;"><strong style="color:#e8e8e8;">Spotify</strong> — live trend data from the charts. <span style="color:#666;">(optional)</span></p>
-    <div style="display:flex;gap:6px;margin-bottom:14px;">
-      <input type="password" id="spIdInput" placeholder="Client ID" style="flex:1;margin-bottom:0;">
-      <input type="password" id="spSecInput" placeholder="Client Secret" style="flex:1;margin-bottom:0;">
-    </div>
-    <p style="font-size:11px;color:#555;margin-bottom:14px;">All keys stored in this browser only.</p>
+    <p style="font-size:11px;color:#555;margin-bottom:6px;">Get a free key at elevenlabs.io. Stored in this browser only.</p>
+    <p style="margin-top:10px;margin-bottom:10px;"><strong style="color:#e8e8e8;">Language</strong></p>
+    <select id="langSelect" onchange="setLang(this.value)" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#e8e8e8;font-size:14px;margin-bottom:14px;">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="pt">Português</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+      <option value="ar">العربية</option>
+      <option value="hi">हिन्दी</option>
+      <option value="zh">中文</option>
+    </select>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="hideModal()">Cancel</button>
+      <button class="btn-cancel" onclick="hideModal()">Close</button>
       <button class="btn-save" onclick="saveKey()">Save</button>
     </div>
   </div>
@@ -671,14 +678,9 @@ Two sentences: gut reaction + where this song lives.
 **RELEASE?** YES or NOT YET + the one move. One sentence.
 
 That's it. No other sections. Readable in 30 seconds.`;
+var PROXY = 'https://sesh-proxy.y6hk47vmzd.workers.dev';
 let msgs = [];
-let key = localStorage.getItem('ak') || '';
 let elKey = localStorage.getItem('elk') || '';
-let spotifyClientId = localStorage.getItem('spId') || '';
-let spotifySecret = localStorage.getItem('spSec') || '';
-var acrHost = 'identify-us-west-2.acrcloud.com';
-var acrKey = '11a2d59c643bd02088f1a48b487fe686';
-var acrSecret = '3Tn5OegOlehPztwnbc02JUy9VLb6MaWupF2lwpGp';
 let busy = false;
 var userLang = localStorage.getItem('sesh_lang') || '';
 
@@ -744,7 +746,6 @@ function buildProfilePrompt() {
 }
 
 function init() {
-  if (key) document.getElementById('keyBtn').classList.add('connected');
   document.getElementById('input').focus();
   setupDragDrop();
   unlockAudio();
@@ -794,23 +795,14 @@ function setupDragDrop() {
 
 function showModal() {
   document.getElementById('modal').classList.add('show');
-  document.getElementById('keyInput').value = key;
   document.getElementById('elKeyInput').value = elKey;
-  document.getElementById('spIdInput').value = spotifyClientId;
-  document.getElementById('spSecInput').value = spotifySecret;
-  document.getElementById('keyInput').focus();
+  if (userLang) document.getElementById('langSelect').value = userLang;
 }
 function hideModal() { document.getElementById('modal').classList.remove('show'); }
 function saveKey() {
-  const k = document.getElementById('keyInput').value.trim();
-  const ek = document.getElementById('elKeyInput').value.trim();
-  const spId = document.getElementById('spIdInput').value.trim();
-  const spSec = document.getElementById('spSecInput').value.trim();
-  if (k) { key=k; localStorage.setItem('ak',k); document.getElementById('keyBtn').classList.add('connected'); }
+  var ek = document.getElementById('elKeyInput').value.trim();
   elKey = ek; localStorage.setItem('elk', ek);
-  spotifyClientId = spId; localStorage.setItem('spId', spId);
-  spotifySecret = spSec; localStorage.setItem('spSec', spSec);
-  if (k) hideModal();
+  hideModal();
 }
 
 function newChat() {
@@ -967,7 +959,7 @@ function onSend() {
 }
 
 function submitStagedFiles() {
-  if (!key) { showModal(); return; }
+
   var files = stagedFiles.slice();
   stagedFiles = [];
   renderStaged();
@@ -1095,12 +1087,9 @@ async function recognizeSong(file) {
   try {
     // Send first 15 seconds of audio for recognition
     var form = new FormData();
-    form.append('host', acrHost);
-    form.append('access_key', acrKey);
-    form.append('access_secret', acrSecret);
     form.append('audio', file, file.name || 'track.mp3');
 
-    var res = await fetch('https://sesh-proxy.y6hk47vmzd.workers.dev/acrcloud', {
+    var res = await fetch(PROXY + '/acrcloud', {
       method: 'POST',
       body: form
     });
@@ -1136,17 +1125,16 @@ async function recognizeSong(file) {
 }
 
 // ---- Step 1: Vocal Isolation via LALAL.AI ----
-var lalalKey = 'c3ac26d625974332';
-var LALAL_PROXY = 'https://sesh-proxy.y6hk47vmzd.workers.dev/lalal';
+// LALAL.AI key is in the Cloudflare Worker — not exposed to browser
 
 async function isolateVocals(file) {
   try {
     // 1. Upload the file
     var uploadForm = new FormData();
     uploadForm.append('file', file, file.name || 'track.mp3');
-    var uploadRes = await fetch(LALAL_PROXY + '/upload/', {
+    var uploadRes = await fetch(PROXY + '/lalal/upload/', {
       method: 'POST',
-      headers: { 'Authorization': 'license ' + lalalKey },
+      headers: {},
       body: uploadForm
     });
     if (!uploadRes.ok) return null;
@@ -1159,9 +1147,9 @@ async function isolateVocals(file) {
     processForm.append('id', fileId);
     processForm.append('filter', '1'); // 1 = vocals
     processForm.append('stem', 'vocals');
-    var processRes = await fetch(LALAL_PROXY + '/preview/', {
+    var processRes = await fetch(PROXY + '/lalal/preview/', {
       method: 'POST',
-      headers: { 'Authorization': 'license ' + lalalKey },
+      headers: {},
       body: processForm
     });
     if (!processRes.ok) return null;
@@ -1170,7 +1158,7 @@ async function isolateVocals(file) {
     var vocalUrl = null;
     for (var poll = 0; poll < 30; poll++) {
       await new Promise(function(r) { setTimeout(r, 2000); });
-      var checkRes = await fetch(LALAL_PROXY + '/check/?id=' + fileId, {
+      var checkRes = await fetch(PROXY + '/lalal/check/?id=' + fileId, {
         headers: { 'Authorization': 'license ' + lalalKey }
       });
       if (!checkRes.ok) continue;
@@ -1621,7 +1609,7 @@ function renderHookLab(t) {
 
 async function handleFile(file) {
   if (!file || !file.type.startsWith('audio/')) return;
-  if (!key) { showModal(); return; }
+
   if (busy) return;
   busy = true;
 
@@ -1740,7 +1728,7 @@ async function handleFile(file) {
     // Fetch Spotify data BEFORE building scores (BPM correction)
     var trends = null;
     var spotifyFeatures = null;
-    if (spotifyClientId) {
+    if (true) { // Spotify credentials are in the proxy
       ad.innerHTML = '<div class="analyzing-spinner"></div>Checking Spotify data...';
       // If ACRCloud identified the song and found a Spotify ID, use that (exact match)
       if (songId && songId.spotifyId) {
@@ -2304,16 +2292,9 @@ var trendCache = null;
 var trendCacheExp = 0;
 
 async function getSpotifyToken() {
-  if (!spotifyClientId || !spotifySecret) return null;
   if (spotifyToken && Date.now() < spotifyTokenExp) return spotifyToken;
   try {
-    var form = new FormData();
-    form.append('client_id', spotifyClientId);
-    form.append('client_secret', spotifySecret);
-    var res = await fetch('https://sesh-proxy.y6hk47vmzd.workers.dev', {
-      method: 'POST',
-      body: form
-    });
+    var res = await fetch(PROXY + '/spotify', { method: 'POST' });
     if (!res.ok) return null;
     var data = await res.json();
     spotifyToken = data.access_token;
@@ -2974,14 +2955,9 @@ function findPreviousVersion(name) {
 async function callAPI(messages, useTrackMode) {
   var sysPrompt = (useTrackMode ? SYS + SYS_TRACK_ADDENDUM : SYS) + getLangInstruction();
   var maxTok = useTrackMode ? 8192 : 4096;
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch(PROXY + '/claude', {
     method:'POST',
-    headers: {
-      'Content-Type':'application/json',
-      'x-api-key':key,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
+    headers: { 'Content-Type':'application/json' },
     body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:maxTok, system:sysPrompt, messages:messages, stream:true })
   });
   if (!res.ok) {
@@ -3003,7 +2979,7 @@ async function sendMessage() {
   const inp = document.getElementById('input');
   const text = inp.value.trim();
   if (!text || busy) return;
-  if (!key) { showModal(); return; }
+
 
   inp.value = ''; inp.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
@@ -3137,7 +3113,7 @@ function clearHistory() {
 
 async function rankCatalog() {
   if (busy) return;
-  if (!key) { showModal(); return; }
+
   var hist = getHistory();
   if (hist.length < 2) {
     showError('Analyze at least 2 tracks to rank your catalog.');
@@ -3398,7 +3374,7 @@ function addSunoButton(trackName) {
 
 async function generateSunoPrompt(trackName, btnEl) {
   if (busy) return;
-  if (!key) { showModal(); return; }
+
   busy = true;
   btnEl.disabled = true;
   btnEl.innerHTML = 'Generating Suno prompt...';
