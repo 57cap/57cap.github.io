@@ -44,6 +44,17 @@ export const config = {
     },
   },
 
+  twilio: {
+    accountSid: str('TWILIO_ACCOUNT_SID'),
+    authToken: str('TWILIO_AUTH_TOKEN'),
+    /** The Twilio WhatsApp sender, e.g. "whatsapp:+14155238886" (sandbox number). */
+    from: str('TWILIO_WHATSAPP_FROM'),
+    /** When true, Twilio is the active WhatsApp transport. */
+    get live(): boolean {
+      return Boolean(this.accountSid && this.authToken && this.from);
+    },
+  },
+
   flexiscore: {
     apiUrl: str('FLEXISCORE_API_URL'),
     apiKey: str('FLEXISCORE_API_KEY'),

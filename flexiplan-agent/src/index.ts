@@ -3,6 +3,7 @@ import { config } from './config.js';
 import { logger } from './logger.js';
 import { whatsappWebhook } from './whatsapp/webhook.js';
 import { adminRoutes } from './server/adminRoutes.js';
+import { activeProvider } from './whatsapp/provider.js';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -22,7 +23,7 @@ app.listen(config.port, () => {
       port: config.port,
       model: config.anthropic.model,
       agent: config.anthropic.enabled ? 'ready' : 'NO API KEY',
-      whatsapp: config.whatsapp.live ? 'live' : 'console',
+      whatsapp: activeProvider(),
       flexiscore: config.flexiscore.live ? 'live' : 'mock',
     },
     'Flexiplan agent listening',

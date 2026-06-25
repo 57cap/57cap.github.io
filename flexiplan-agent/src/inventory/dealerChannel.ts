@@ -1,7 +1,7 @@
 import { config } from '../config.js';
 import { logger } from '../logger.js';
 import type { Dealer } from '../types.js';
-import { sendWhatsAppText } from '../whatsapp/metaClient.js';
+import { activeProvider, sendText } from '../whatsapp/provider.js';
 
 /**
  * Outbound channel for reaching dealers (WhatsApp → email → phone fallback).
@@ -23,9 +23,9 @@ export interface DealerOutreachResult {
 /** Try to reach a dealer over the best available channel. */
 export async function contactDealer(dealer: Dealer, message: string): Promise<DealerOutreachResult> {
   // 1) WhatsApp — preferred (immediate, trackable).
-  if (dealer.whatsapp && config.whatsapp.live) {
+  if (dealer.whatsapp && activeProvider() !== 'console') {
     const wa = normalizePhone(dealer.whatsapp);
-    const ok = await sendWhatsAppText(wa, message).then(
+    const ok = await sendText(wa, message).then(
       () => true,
       (err) => {
         logger.warn({ err, dealer: dealer.id }, 'Dealer WhatsApp send failed');

@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { config } from '../config.js';
 import { handleCustomerMessage } from '../agent/salesAgent.js';
 import { allInventoryChecks, allLeads } from '../store/store.js';
+import { activeProvider } from '../whatsapp/provider.js';
 
 /**
  * Internal/admin + demo routes.
@@ -16,7 +17,7 @@ adminRoutes.get('/healthz', (_req: Request, res: Response) => {
   res.json({
     ok: true,
     agent: config.anthropic.enabled ? 'ready' : 'no_api_key',
-    whatsapp: config.whatsapp.live ? 'live' : 'console',
+    whatsapp_provider: activeProvider(),
     flexiscore: config.flexiscore.live ? 'live' : 'mock',
     model: config.anthropic.model,
   });

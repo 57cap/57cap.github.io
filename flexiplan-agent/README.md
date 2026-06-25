@@ -94,7 +94,24 @@ curl -X POST localhost:8080/sim/message \
 
 ---
 
-## Connecting WhatsApp (Meta Cloud API)
+## Connecting WhatsApp
+
+The transport is auto-selected from env: **Twilio** if its creds are set, else
+**Meta** if its creds are set, else **console** mode (replies logged).
+
+### Easiest to test — Twilio WhatsApp Sandbox (no Meta verification)
+
+1. Create a free Twilio account → Console → **Messaging › Try it out › Send a
+   WhatsApp message**. Note the **sandbox number** and the **join code**.
+2. From your phone's WhatsApp, send `join <your-code>` to the sandbox number.
+3. Set in your env: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and
+   `TWILIO_WHATSAPP_FROM=whatsapp:+14155238886` (the sandbox sender).
+4. In the sandbox settings, set **"When a message comes in"** to
+   `https://YOUR_HOST/webhook/twilio` (POST). You need a public URL — see Deployment.
+5. Message the sandbox number from your phone — Sofía replies.
+
+### Production — Meta WhatsApp Cloud API
+
 
 1. Create a Meta app → add **WhatsApp** → get a **Phone Number ID** and a token.
 2. Set `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, and a `WHATSAPP_VERIFY_TOKEN`
