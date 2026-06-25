@@ -1736,9 +1736,20 @@ async function handleFile(file) {
 
     ad.remove();
 
-    const scores = computeScores(analysis, lyricFeatures, spotifyFeatures);
-    const dna = computeViralDNA(analysis);
-    scores.dna = dna;
+    // Check cache — same file should always get same scores
+    var fileHash = file.name + '_' + file.size + '_' + Math.round(analysis.duration * 100);
+    var cachedScores = null;
+    try { cachedScores = JSON.parse(localStorage.getItem('sesh_score_' + fileHash)); } catch(e) {}
+
+    var scores;
+    if (cachedScores) {
+      scores = cachedScores;
+    } else {
+      scores = computeScores(analysis, lyricFeatures, spotifyFeatures);
+      var dna = computeViralDNA(analysis);
+      scores.dna = dna;
+      try { localStorage.setItem('sesh_score_' + fileHash, JSON.stringify(scores)); } catch(e) {}
+    }
     var savedLyrics = (lyricFeatures && lyricFeatures.transcript) ? lyricFeatures.transcript : null;
     saveToHistory(file.name, analysis, scores, savedLyrics);
 
@@ -2496,24 +2507,10 @@ function computeScores(a, lf, sp) {
     overall = Math.round(techAvg * 0.3 + feelAvg * 0.7);
   }
 
-  // Remap to a scale people understand intuitively (school grades)
-  // Raw 0-100 → Display 40-100
-  // Raw 0 → Display 40 (floor — even a terrible song shows 40, not 0)
-  // Raw 50 → Display 65 (needs work feels like a D+, not an F)
-  // Raw 75 → Display 82 (good song = B+)
-  // Raw 90 → Display 93 (hit = A+)
-  // Remap all visible scores to intuitive scale
-  var remap = function(raw) { return Math.max(40, Math.min(99, Math.round(40 + raw * 0.6))); };
-  melodyScore = remap(melodyScore);
-  voiceScore = remap(voiceScore);
-  grooveScore = remap(grooveScore);
-  emotionScore = remap(emotionScore);
-  magicScore = remap(magicScore);
-  var displayScore = remap(overall);
+  // Honest raw scores — no remapping
+  var grade = overall >= 90 ? 'S' : overall >= 78 ? 'A' : overall >= 65 ? 'B' : overall >= 50 ? 'C' : 'D';
 
-  var grade = displayScore >= 93 ? 'S' : displayScore >= 83 ? 'A' : displayScore >= 73 ? 'B' : displayScore >= 60 ? 'C' : 'D';
-
-  return { introScore, dynamicsScore, prodScore, hookScore, melodyScore, voiceScore, grooveScore, magicScore, emotionScore, techAvg, feelAvg, overall: displayScore, grade };
+  return { introScore, dynamicsScore, prodScore, hookScore, melodyScore, voiceScore, grooveScore, magicScore, emotionScore, techAvg, feelAvg, overall, grade };
 }
 
 // ---- Viral DNA Engine ----
@@ -2633,23 +2630,23 @@ function buildScoreCard(name, a, s) {
 
 function buildOverallSection(s) {
   var gc = 'score-' + s.grade.toLowerCase();
-  var meaning = s.overall >= 93 ? 'Hit potential — this could blow up' :
-    s.overall >= 83 ? 'Strong — ready with minor tweaks' :
-    s.overall >= 73 ? 'Solid foundation — needs polish' :
-    s.overall >= 60 ? 'Has potential — needs real work' :
-    'Start over — fundamental issues';
-  var barColor = s.overall >= 93 ? '#34d399' : s.overall >= 83 ? '#c4a1ff' : s.overall >= 73 ? '#fbbf24' : s.overall >= 60 ? '#fb923c' : '#ef4444';
+  var meaning = s.overall >= 90 ? 'Hit-ready — competes with charting songs' :
+    s.overall >= 78 ? 'Release-ready — strong enough for major playlists' :
+    s.overall >= 65 ? 'Spotify-ready — solid independent release' :
+    s.overall >= 50 ? 'Demo quality — has ideas but needs production/polish' :
+    'Early draft — keep developing';
+  var barColor = s.overall >= 90 ? '#34d399' : s.overall >= 78 ? '#c4a1ff' : s.overall >= 65 ? '#fbbf24' : s.overall >= 50 ? '#fb923c' : '#ef4444';
 
   return '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #333;">' +
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;font-weight:600;color:#e8e8e8;">Overall</span><span style="font-size:20px;font-weight:700;color:' + barColor + ';">' + s.overall + '</span></div>' +
     '<div class="score-bar" style="height:8px;margin-bottom:8px;"><div class="score-bar-fill" style="width:' + s.overall + '%;background:' + barColor + ';"></div></div>' +
     '<div style="font-size:13px;color:' + barColor + ';font-weight:500;margin-bottom:14px;">' + meaning + '</div>' +
     '<div style="display:flex;gap:4px;font-size:10px;font-weight:600;letter-spacing:0.3px;">' +
-    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall < 60 ? 'background:#ef4444;color:#fff;' : 'background:#2a2a2a;color:#555;') + '">Below 60<br><span style="font-weight:400;font-size:9px;">Start over</span></div>' +
-    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 60 && s.overall < 73 ? 'background:#fb923c;color:#fff;' : 'background:#2a2a2a;color:#555;') + '">60-72<br><span style="font-weight:400;font-size:9px;">Needs work</span></div>' +
-    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 73 && s.overall < 83 ? 'background:#fbbf24;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">73-82<br><span style="font-weight:400;font-size:9px;">Solid</span></div>' +
-    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 83 && s.overall < 93 ? 'background:#c4a1ff;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">83-92<br><span style="font-weight:400;font-size:9px;">Strong</span></div>' +
-    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 93 ? 'background:#34d399;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">93+<br><span style="font-weight:400;font-size:9px;">Hit</span></div>' +
+    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall < 50 ? 'background:#ef4444;color:#fff;' : 'background:#2a2a2a;color:#555;') + '">0-49<br><span style="font-weight:400;font-size:9px;">Demo</span></div>' +
+    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 50 && s.overall < 65 ? 'background:#fb923c;color:#fff;' : 'background:#2a2a2a;color:#555;') + '">50-64<br><span style="font-weight:400;font-size:9px;">Indie</span></div>' +
+    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 65 && s.overall < 78 ? 'background:#fbbf24;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">65-77<br><span style="font-weight:400;font-size:9px;">Spotify</span></div>' +
+    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 78 && s.overall < 90 ? 'background:#c4a1ff;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">78-89<br><span style="font-weight:400;font-size:9px;">Charting</span></div>' +
+    '<div style="flex:1;padding:6px 0;text-align:center;border-radius:4px;' + (s.overall >= 90 ? 'background:#34d399;color:#1a1a1a;' : 'background:#2a2a2a;color:#555;') + '">90+<br><span style="font-weight:400;font-size:9px;">Hit</span></div>' +
     '</div></div>';
 }
 
