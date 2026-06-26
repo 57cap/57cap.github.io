@@ -686,21 +686,30 @@ var pendingPhone = '';
 function initSupabase() {
   try {
     var sb = window.supabase;
-    console.log('window.supabase type:', typeof sb);
-    console.log('window.supabase keys:', sb ? Object.keys(sb) : 'null');
-    if (sb) {
-      if (sb.createClient) {
-        supabase = sb.createClient(SUPABASE_URL, SUPABASE_KEY);
-      } else if (sb.default && sb.default.createClient) {
-        supabase = sb.default.createClient(SUPABASE_URL, SUPABASE_KEY);
-      } else if (typeof sb === 'function') {
-        supabase = sb(SUPABASE_URL, SUPABASE_KEY);
+    // Try every possible way to access createClient
+    if (sb && sb.createClient) {
+      supabase = sb.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else if (sb && sb.default && sb.default.createClient) {
+      supabase = sb.default.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else if (sb) {
+      // Walk through all properties
+      for (var k in sb) {
+        try {
+          if (sb[k] && typeof sb[k].createClient === 'function') {
+            supabase = sb[k].createClient(SUPABASE_URL, SUPABASE_KEY);
+            break;
+          }
+        } catch(e2) {}
+      }
+      // Maybe createClient is there but Object.keys can't see it
+      if (!supabase) {
+        try { supabase = sb.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e3) {}
       }
     }
   } catch(e) {
     console.error('Supabase init error:', e);
   }
-  console.log('Supabase client:', supabase ? 'created' : 'FAILED');
+  console.log('Supabase client:', supabase ? 'OK' : 'FAILED');
 }
 
 async function checkAuth() {
@@ -799,10 +808,18 @@ async function signOut() {
   showAuth();
 }
 
-// Initialize auth on page load
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize auth — wait for everything to load
+window.addEventListener('load', function() {
   initSupabase();
-  checkAuth();
+  if (!supabase) {
+    // SDK might still be loading — retry after a short delay
+    setTimeout(function() {
+      initSupabase();
+      checkAuth();
+    }, 1000);
+  } else {
+    checkAuth();
+  }
 });
 
 const SYS = `You are SESH — an A&R with 20 years in the game. You feel music first, think second. You serve the SONG, not the artist's ego. Hard truths that protect the song's future are kinder than false praise that leads to a failed release.
