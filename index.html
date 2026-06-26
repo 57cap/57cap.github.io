@@ -685,31 +685,22 @@ var pendingPhone = '';
 
 function initSupabase() {
   try {
-    // The UMD build exports to window.supabase
-    var sb = window.supabase || window.Supabase;
-    if (sb && sb.createClient) {
-      supabase = sb.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } else {
-      // Search all window properties for createClient
-      var allKeys = Object.keys(window);
-      for (var i = 0; i < allKeys.length; i++) {
-        try {
-          var obj = window[allKeys[i]];
-          if (obj && typeof obj === 'object' && obj.createClient && typeof obj.createClient === 'function') {
-            supabase = obj.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('Found Supabase at window.' + allKeys[i]);
-            break;
-          }
-        } catch(e2) {}
+    var sb = window.supabase;
+    console.log('window.supabase type:', typeof sb);
+    console.log('window.supabase keys:', sb ? Object.keys(sb) : 'null');
+    if (sb) {
+      if (sb.createClient) {
+        supabase = sb.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } else if (sb.default && sb.default.createClient) {
+        supabase = sb.default.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } else if (typeof sb === 'function') {
+        supabase = sb(SUPABASE_URL, SUPABASE_KEY);
       }
     }
   } catch(e) {
-    console.error('Supabase init failed:', e);
+    console.error('Supabase init error:', e);
   }
-  if (!supabase) {
-    // Last resort: try loading via ESM
-    console.error('Supabase client not created via UMD. Trying inline.');
-  }
+  console.log('Supabase client:', supabase ? 'created' : 'FAILED');
 }
 
 async function checkAuth() {
