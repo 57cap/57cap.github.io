@@ -739,15 +739,15 @@ async function sendCode() {
   btn.textContent = 'Sending...';
 
   try {
-    var { error } = await supabase.auth.signInWithOtp({ phone: phone });
-    if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Send verification code'; return; }
+    var result = await supabase.auth.signInWithOtp({ phone: phone });
+    if (result.error) { showAuthError(result.error.message + ' (' + result.error.status + ')'); btn.disabled = false; btn.textContent = 'Send verification code'; return; }
     pendingPhone = phone;
     document.getElementById('authPhone').textContent = phone;
     document.getElementById('authStep1').style.display = 'none';
     document.getElementById('authStep2').style.display = 'block';
     document.getElementById('codeInput').focus();
   } catch(e) {
-    showAuthError('Failed to send code. Try again.');
+    showAuthError('Error: ' + e.message);
   }
   btn.disabled = false;
   btn.textContent = 'Send verification code';
