@@ -684,13 +684,27 @@ var currentUser = null;
 var pendingPhone = '';
 
 function initSupabase() {
-  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else if (window.Supabase && window.Supabase.createClient) {
+      supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else {
+      // Try the UMD global
+      var keys = Object.keys(window).filter(function(k) { return k.toLowerCase().indexOf('supabase') >= 0; });
+      for (var i = 0; i < keys.length; i++) {
+        var obj = window[keys[i]];
+        if (obj && obj.createClient) { supabase = obj.createClient(SUPABASE_URL, SUPABASE_KEY); break; }
+      }
+    }
+  } catch(e) {
+    console.error('Supabase init failed:', e);
   }
+  if (!supabase) console.error('Supabase client not created. Available globals:', Object.keys(window).filter(function(k){return k.toLowerCase().indexOf('supa')>=0;}));
 }
 
 async function checkAuth() {
-  if (!supabase) { showApp(); return; }
+  if (!supabase) { showAuthError('App loading error — please refresh the page.'); showAuth(); return; }
   try {
     var { data } = await supabase.auth.getSession();
     if (data && data.session && data.session.user) {
@@ -739,6 +753,7 @@ async function sendCode() {
   btn.textContent = 'Sending...';
 
   try {
+    if (!supabase) { showAuthError('App not loaded. Refresh the page.'); btn.disabled = false; btn.textContent = 'Send verification code'; return; }
     var result = await supabase.auth.signInWithOtp({ phone: phone });
     if (result.error) { showAuthError(result.error.message + ' (' + result.error.status + ')'); btn.disabled = false; btn.textContent = 'Send verification code'; return; }
     pendingPhone = phone;
