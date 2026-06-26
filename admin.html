@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SESH Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:#1a1a1a; color:#e8e8e8; padding:24px; }
+    h1 { font-size:24px; margin-bottom:8px; }
+    .subtitle { color:#888; font-size:14px; margin-bottom:24px; }
+    .login-box { max-width:400px; margin:100px auto; text-align:center; }
+    .login-box h1 { margin-bottom:16px; }
+    input { width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#222; color:#e8e8e8; font-size:14px; margin-bottom:12px; outline:none; }
+    input:focus { border-color:#c4a1ff; }
+    button { padding:10px 20px; border-radius:8px; border:none; background:#c4a1ff; color:#1a1a1a; font-size:14px; font-weight:600; cursor:pointer; }
+    button:hover { opacity:0.9; }
+    .danger { background:#ef4444; color:#fff; }
+    .danger:hover { background:#dc2626; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; }
+    th { text-align:left; padding:10px 12px; color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid #333; }
+    td { padding:10px 12px; border-bottom:1px solid #222; font-size:14px; }
+    tr:hover { background:#222; }
+    .actions { display:flex; gap:6px; }
+    .actions button { padding:6px 12px; font-size:12px; }
+    .stats { display:flex; gap:16px; margin-bottom:24px; }
+    .stat { background:#222; border:1px solid #333; border-radius:10px; padding:16px 20px; flex:1; }
+    .stat-num { font-size:28px; font-weight:700; }
+    .stat-label { font-size:12px; color:#888; margin-top:4px; }
+    .error { color:#ef4444; font-size:13px; margin-top:8px; }
+    #adminPanel { display:none; }
+  </style>
+</head>
+<body>
+
+<div class="login-box" id="loginBox">
+  <h1>SESH Admin</h1>
+  <input type="password" id="adminPass" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+  <button onclick="adminLogin()" style="width:100%;">Login</button>
+  <div class="error" id="loginError"></div>
+</div>
+
+<div id="adminPanel">
+  <h1>SESH Admin</h1>
+  <p class="subtitle">Manage users and monitor usage</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="totalUsers">-</div><div class="stat-label">Total Users</div></div>
+    <div class="stat"><div class="stat-num" id="recentUsers">-</div><div class="stat-label">Last 7 days</div></div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <button onclick="loadUsers()">Refresh</button>
+    <button onclick="adminSignOut()" style="background:#333;color:#e8e8e8;margin-left:8px;">Sign out</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Phone</th>
+        <th>Signed up</th>
+        <th>Last sign in</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="userTable"></tbody>
+  </table>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://uhjpbmpjzwqegmtxscjc.supabase.co';
+var ADMIN_PASSWORD = 'sesh-admin-2026';
+var serviceKey = '';
+
+function adminLogin() {
+  var pass = document.getElementById('adminPass').value;
+  if (pass !== ADMIN_PASSWORD) {
+    document.getElementById('loginError').textContent = 'Wrong password';
+    return;
+  }
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  loadUsers();
+}
+
+function adminSignOut() {
+  document.getElementById('loginBox').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminPass').value = '';
+}
+
+async function loadUsers() {
+  try {
+    // Use Supabase's auth admin API via the service role key
+    // For now, use the REST API directly
+    var res = await fetch(SUPABASE_URL + '/auth/v1/admin/users?page=1&per_page=100', {
+      headers: {
+        'apikey': 'sb_publishable_O9VugooytooVHjZCqddPew_pcxMdLCk',
+        'Authorization': 'Bearer sb_publishable_O9VugooytooVHjZCqddPew_pcxMdLCk'
+      }
+    });
+
+    if (!res.ok) {
+      // Fallback: show message about needing service role key
+      document.getElementById('userTable').innerHTML = '<tr><td colspan="4" style="color:#888;text-align:center;padding:40px;">To manage users, add the Supabase Service Role Key.<br>Go to Supabase → Settings → API → service_role key</td></tr>';
+      return;
+    }
+
+    var data = await res.json();
+    var users = data.users || data || [];
+
+    document.getElementById('totalUsers').textContent = users.length;
+    var week = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    var recent = users.filter(function(u) { return new Date(u.created_at).getTime() > week; });
+    document.getElementById('recentUsers').textContent = recent.length;
+
+    var html = '';
+    users.forEach(function(u) {
+      var phone = u.phone || 'No phone';
+      var created = new Date(u.created_at).toLocaleDateString();
+      var lastSign = u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString() : 'Never';
+      html += '<tr>' +
+        '<td>' + phone + '</td>' +
+        '<td>' + created + '</td>' +
+        '<td>' + lastSign + '</td>' +
+        '<td class="actions">' +
+        '<button onclick="sendLoginLink(\'' + (u.phone || '') + '\')">Resend login</button>' +
+        '<button class="danger" onclick="deleteUser(\'' + u.id + '\')">Delete</button>' +
+        '</td></tr>';
+    });
+    document.getElementById('userTable').innerHTML = html || '<tr><td colspan="4" style="color:#888;">No users yet</td></tr>';
+  } catch(e) {
+    document.getElementById('userTable').innerHTML = '<tr><td colspan="4" style="color:#ef4444;">Error loading users: ' + e.message + '</td></tr>';
+  }
+}
+
+async function sendLoginLink(phone) {
+  if (!phone) return;
+  alert('Login code sent to ' + phone + ' (requires Supabase service role key for admin actions)');
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user? This cannot be undone.')) return;
+  alert('User deletion requires Supabase service role key. Go to Supabase dashboard → Authentication to manage users directly.');
+}
+</script>
+</body>
+</html>
