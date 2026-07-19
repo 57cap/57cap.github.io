@@ -56,67 +56,78 @@
     color: var(--text-primary);
     font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 64px; }
 
   header h1 { font-size: 22px; margin: 0 0 2px; }
-  header .sub { color: var(--text-secondary); margin: 0 0 20px; }
+  header .sub { color: var(--text-secondary); margin: 0 0 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+  .chip.live .dot { background: var(--status-good); }
+  .chip.hot { color: var(--status-critical); border-color: var(--status-critical); }
+  .chip.hot .dot { background: var(--status-critical); }
+
+  .banner {
+    display: block; width: 100%; text-align: center; cursor: pointer;
+    font: inherit; font-size: 15px; font-weight: 700; color: #fff;
+    background: var(--series-1); border: none; border-radius: 10px;
+    padding: 14px; margin-bottom: 16px;
+  }
 
   .card {
     background: var(--surface-1);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
-  /* Controls — one row above everything they scope */
-  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  /* Hero */
+  .hero { text-align: center; padding: 22px 16px; }
+  .hero .label { font-size: 13px; color: var(--text-secondary); }
+  .hero .big { font-size: 52px; font-weight: 700; line-height: 1.1; margin: 4px 0 2px; }
+  .hero .delta { font-size: 15px; color: var(--text-muted); min-height: 22px; }
+  .hero .delta.good { color: var(--delta-good); font-weight: 600; }
+  .hero .delta.bad  { color: var(--status-critical); font-weight: 600; }
+  .hero .meta { font-size: 13px; color: var(--text-secondary); margin: 8px 0 14px; }
+  a.buy {
+    display: block; text-decoration: none; text-align: center;
+    font-size: 17px; font-weight: 700; border-radius: 10px; padding: 14px;
+    background: var(--status-good); color: #fff;
+  }
+
+  /* Smart line + advanced */
+  .smartline { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+  .smartline strong { color: var(--text-primary); }
+  details.adv { margin-top: 10px; border-top: 1px solid var(--gridline); padding-top: 10px; }
+  details.adv summary { cursor: pointer; font-size: 13px; color: var(--text-muted); }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; }
   .controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-secondary); }
   .controls input {
     font: inherit; color: var(--text-primary);
     background: var(--page); border: 1px solid var(--border); border-radius: 6px;
-    padding: 6px 8px; width: 120px;
+    padding: 6px 8px; width: 110px;
   }
-  .controls input#tmKey { width: 220px; }
-  .controls input#dropPct { width: 70px; }
+  .controls input#tmKey { width: 210px; }
+  .controls input:disabled { opacity: 0.5; }
   .controls label.check {
     flex-direction: row; align-items: center; gap: 6px;
     font-size: 13px; color: var(--text-primary); padding-bottom: 8px;
   }
   .controls label.check input { width: auto; margin: 0; }
-  a.buy {
-    display: inline-block; text-decoration: none;
-    font-weight: 700; border-radius: 6px; padding: 7px 14px;
-    background: var(--status-good); color: #fff;
-  }
-  button {
-    font: inherit; font-weight: 600; cursor: pointer;
+  button.small {
+    font: inherit; font-size: 13px; cursor: pointer;
     border: 1px solid var(--border); border-radius: 6px;
-    padding: 7px 14px; background: var(--surface-1); color: var(--text-primary);
+    padding: 6px 12px; background: var(--surface-1); color: var(--text-primary);
   }
-  button.primary { background: var(--series-1); border-color: transparent; color: #fff; }
-  .statuspill {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--text-secondary); padding: 6px 0 7px;
-  }
-  .statuspill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
-  .statuspill.live .dot { background: var(--status-good); }
-  .statuspill.alert .dot { background: var(--status-critical); }
-
-  /* Stat tiles */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-  .tile .value { font-size: 26px; font-weight: 600; }
-  .tile .delta { font-size: 12px; margin-top: 2px; color: var(--text-muted); }
-  .tile .delta.good { color: var(--delta-good); }
-  .tile .delta.bad  { color: var(--status-critical); }
-  .tile .note { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
   /* Chart */
-  .chart-card h2, .log-card h2, details.card summary {
-    font-size: 14px; font-weight: 600; margin: 0 0 10px; color: var(--text-primary);
-  }
+  .chart-card h2 { font-size: 14px; font-weight: 600; margin: 0 0 10px; }
   .chart-wrap { position: relative; }
   .chart-wrap svg { display: block; width: 100%; height: auto; }
   .chart-empty { color: var(--text-muted); font-size: 13px; padding: 40px 0; text-align: center; }
@@ -132,82 +143,73 @@
   .tooltip .tt-val { font-weight: 700; }
   .tooltip .tt-sub { color: var(--text-secondary); }
 
-  /* Log */
+  /* Log & table */
+  details.card > summary { cursor: pointer; font-size: 14px; font-weight: 600; }
   .log {
     font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
     color: var(--text-secondary);
-    max-height: 260px; overflow-y: auto;
+    max-height: 240px; overflow-y: auto;
     white-space: pre-wrap; word-break: break-word;
+    margin-top: 10px;
   }
   .log .alertline { color: var(--status-critical); font-weight: 700; }
-
-  /* Table view */
-  details.card summary { cursor: pointer; margin: 0; }
   table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; }
   th { text-align: left; color: var(--text-secondary); font-weight: 600; }
   th, td { padding: 5px 10px 5px 0; border-bottom: 1px solid var(--gridline); }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
-  .foot { font-size: 12px; color: var(--text-muted); margin-top: 24px; }
-  .foot a { color: var(--text-secondary); }
+  .foot { font-size: 12px; color: var(--text-muted); margin-top: 20px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>World Cup Final ticket watch</h1>
-    <p class="sub">Spain vs Argentina &middot; MetLife Stadium &middot; July 19, 2026 &middot; polls SeatGeek + Ticketmaster from your browser</p>
+    <p class="sub">Spain vs Argentina &middot; MetLife Stadium &middot; today, July 19</p>
+    <div class="chips">
+      <span class="chip" id="kickChip"><span class="dot"></span><span id="kickText">kickoff&hellip;</span></span>
+      <span class="chip" id="statusChip"><span class="dot"></span><span id="statusText">starting&hellip;</span></span>
+    </div>
   </header>
 
-  <section class="card">
-    <div class="controls">
-      <label>Alert below (USD)
-        <input id="threshold" type="number" min="0" step="100" value="8000">
-      </label>
-      <label>Poll every (seconds)
-        <input id="interval" type="number" min="30" step="10" value="120">
-      </label>
-      <label>Ticketmaster API key (optional, stays in this browser)
-        <input id="tmKey" type="password" placeholder="paste Discovery key" autocomplete="off">
-      </label>
-      <label>Fast-drop alert (%)
-        <input id="dropPct" type="number" min="0.5" step="0.5" value="5">
-      </label>
-      <label class="check"><input id="snipeMode" type="checkbox"> Snipe mode (poll 30s, auto-open)</label>
-      <label class="check"><input id="autoOpen" type="checkbox"> Auto-open SeatGeek on alert</label>
-      <button id="notifyBtn" type="button">Enable notifications</button>
-      <button id="toggleBtn" class="primary" type="button">Stop</button>
-      <a id="buyBtn" class="buy" href="#" target="_blank" rel="noopener" hidden>Buy on SeatGeek ↗</a>
-      <span id="statuspill" class="statuspill"><span class="dot"></span><span id="statustext">starting&hellip;</span></span>
-    </div>
+  <button class="banner" id="enableBanner" hidden>🔔 Tap once to turn on sound + alerts</button>
+
+  <section class="card hero">
+    <div class="label">Cheapest ticket right now (SeatGeek)</div>
+    <div class="big" id="heroPrice">&mdash;</div>
+    <div class="delta" id="heroDelta"></div>
+    <div class="meta" id="heroMeta">Checking prices&hellip;</div>
+    <a id="buyBtn" class="buy" href="#" target="_blank" rel="noopener" hidden>Buy now on SeatGeek ↗</a>
   </section>
 
-  <section class="tiles">
-    <div class="tile">
-      <div class="label">Current get-in (SeatGeek)</div>
-      <div class="value" id="tileCurrent">&mdash;</div>
-      <div class="delta" id="tileDelta"></div>
-    </div>
-    <div class="tile">
-      <div class="label">Session low</div>
-      <div class="value" id="tileLow">&mdash;</div>
-      <div class="delta" id="tileLowNote"></div>
-    </div>
-    <div class="tile">
-      <div class="label">Listings (SeatGeek)</div>
-      <div class="value" id="tileListings">&mdash;</div>
-    </div>
-    <div class="tile">
-      <div class="label">Ticketmaster range</div>
-      <div class="value" id="tileTM">&mdash;</div>
-      <div class="note">approximate &mdash; Discovery data can be stale for resale</div>
-    </div>
+  <section class="card">
+    <div class="smartline" id="smartLine">⚡ Everything is automatic &mdash; this page checks prices, watches for drops, and alerts you.</div>
+    <details class="adv">
+      <summary>Advanced settings</summary>
+      <div class="controls">
+        <label class="check"><input id="smartMode" type="checkbox" checked> Automatic (recommended)</label>
+        <label>Alert below (USD)
+          <input id="threshold" type="number" min="0" step="100" value="8000" disabled>
+        </label>
+        <label>Check every (seconds)
+          <input id="interval" type="number" min="15" step="5" value="120" disabled>
+        </label>
+        <label>Fast-drop alert (%)
+          <input id="dropPct" type="number" min="0.5" step="0.5" value="3" disabled>
+        </label>
+        <label class="check"><input id="autoOpen" type="checkbox"> Auto-open SeatGeek on alert</label>
+        <label>Ticketmaster API key (optional, stays in this browser)
+          <input id="tmKey" type="password" placeholder="paste Discovery key" autocomplete="off">
+        </label>
+        <button class="small" id="toggleBtn" type="button">Pause</button>
+      </div>
+    </details>
   </section>
 
   <section class="card chart-card">
-    <h2>SeatGeek get-in price</h2>
+    <h2>Price today</h2>
     <div class="chart-wrap" id="chartWrap">
-      <div class="chart-empty" id="chartEmpty">Waiting for the first poll&hellip;</div>
+      <div class="chart-empty" id="chartEmpty">Waiting for the first price check&hellip;</div>
       <div class="tooltip" id="tooltip">
         <div class="tt-time"></div>
         <div class="tt-row"><span class="tt-key"></span><span class="tt-val"></span></div>
@@ -216,10 +218,10 @@
     </div>
   </section>
 
-  <section class="card log-card">
-    <h2>Log</h2>
+  <details class="card">
+    <summary>Activity log</summary>
     <div class="log" id="log" aria-live="polite"></div>
-  </section>
+  </details>
 
   <details class="card">
     <summary>History table</summary>
@@ -233,11 +235,10 @@
   </details>
 
   <p class="foot">
-    Alerts fire on every new session low below the threshold and on any fast drop (likely a panic-sell listing),
-    with a 30-second cooldown between bursts. Clicking an alert notification (or the Buy button) opens the
-    SeatGeek page for the event &mdash; the public API only exposes the aggregate get-in price, not individual
-    listings, so the final seat pick happens on SeatGeek. Keep this tab open; the poll runs in your browser.
-    Data &copy; SeatGeek / Ticketmaster.
+    Alerts fire on new lows and sudden drops (a 30-second cooldown stops spam). Tapping an alert opens SeatGeek
+    to buy &mdash; the final seat pick happens there. Keep this tab open and your screen on; the checking runs in
+    your browser. iPhone can't show web notifications, but the sound, the flashing tab, and this page still alert
+    you. Data &copy; SeatGeek / Ticketmaster.
   </p>
 </div>
 
@@ -245,34 +246,70 @@
 "use strict";
 
 /* ------------------------------------------------------------------ */
-/* Config & state                                                      */
+/* Constants                                                           */
 /* ------------------------------------------------------------------ */
 const SEATGEEK_CLIENT_ID = "NTk3MzgwNzR8MTc4NDQ4MDc0OC4xNTk4NDQy";
 const EVENT_DATE = "2026-07-19";
+const KICKOFF = Date.parse("2026-07-19T19:00:00Z"); // 3:00 PM ET at MetLife
 const VENUE_KEYWORD = "metlife";
 const STORE_KEY = "wcwatch-" + EVENT_DATE;
+const ALERT_COOLDOWN_MS = 30 * 1000;
+const DEFAULT_THRESHOLD = 8000;
 
 const els = {};
-["threshold","interval","tmKey","dropPct","snipeMode","autoOpen","buyBtn",
- "notifyBtn","toggleBtn","statuspill","statustext",
- "tileCurrent","tileDelta","tileLow","tileLowNote","tileListings","tileTM",
+["threshold","interval","tmKey","dropPct","smartMode","autoOpen","buyBtn",
+ "toggleBtn","statusChip","statusText","kickChip","kickText","enableBanner",
+ "heroPrice","heroDelta","heroMeta","smartLine",
  "chartWrap","chartEmpty","tooltip","log","historyBody"]
   .forEach(id => els[id] = document.getElementById(id));
-
-const ALERT_COOLDOWN_MS = 30 * 1000; // min gap between alert bursts
 
 const state = {
   history: [],        // {t: epoch-ms, price, listings, tmMin, tmMax}
   sessionLow: null,
   lastPrice: null,
   lastAlertAt: 0,
-  eventUrl: null,     // SeatGeek buy page for the matched event
+  eventUrl: null,
   running: false,
   timer: null,
   audioCtx: null
 };
 
-/* Persistence: survive a tab reload on match day */
+/* ------------------------------------------------------------------ */
+/* Automatic settings                                                  */
+/* ------------------------------------------------------------------ */
+function smart() { return els.smartMode.checked; }
+
+function effInterval() {
+  if (!smart()) return Math.max(15, Number(els.interval.value) || 120);
+  const toKick = KICKOFF - Date.now();
+  if (toKick < 3 * 3600 * 1000) return 30;   // last 3 hours (and in-play): fast
+  if (toKick < 12 * 3600 * 1000) return 60;
+  return 120;
+}
+
+function effThreshold() {
+  if (!smart()) return Number(els.threshold.value) || DEFAULT_THRESHOLD;
+  const prices = state.history.filter(p => p.price != null).slice(-12).map(p => p.price);
+  if (!prices.length) return DEFAULT_THRESHOLD;
+  const sorted = [...prices].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  return Math.round((median * 0.92) / 50) * 50; // 8% below recent market
+}
+
+function effDropPct() {
+  return smart() ? 3 : Math.max(0.5, Number(els.dropPct.value) || 3);
+}
+
+function fmtToKick() {
+  const ms = KICKOFF - Date.now();
+  if (ms <= 0) return null;
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? h + "h " + m + "m" : m + "m";
+}
+
+/* ------------------------------------------------------------------ */
+/* Persistence                                                         */
+/* ------------------------------------------------------------------ */
 function save() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify({
@@ -280,12 +317,12 @@ function save() {
       sessionLow: state.sessionLow,
       lastPrice: state.lastPrice,
       eventUrl: state.eventUrl,
+      smartMode: els.smartMode.checked,
       threshold: els.threshold.value,
       interval: els.interval.value,
-      tmKey: els.tmKey.value,
       dropPct: els.dropPct.value,
       autoOpen: els.autoOpen.checked,
-      snipeMode: els.snipeMode.checked
+      tmKey: els.tmKey.value
     }));
   } catch (e) { /* storage full/blocked — monitoring still works */ }
 }
@@ -298,12 +335,12 @@ function load() {
     state.sessionLow = typeof s.sessionLow === "number" ? s.sessionLow : null;
     state.lastPrice = typeof s.lastPrice === "number" ? s.lastPrice : null;
     if (typeof s.eventUrl === "string" && /^https:\/\/seatgeek\.com\//.test(s.eventUrl)) setEventUrl(s.eventUrl);
+    els.smartMode.checked = s.smartMode !== false; // default ON
     if (s.threshold) els.threshold.value = s.threshold;
     if (s.interval) els.interval.value = s.interval;
-    if (s.tmKey) els.tmKey.value = s.tmKey;
     if (s.dropPct) els.dropPct.value = s.dropPct;
     els.autoOpen.checked = !!s.autoOpen;
-    els.snipeMode.checked = !!s.snipeMode;
+    if (s.tmKey) els.tmKey.value = s.tmKey;
   } catch (e) { /* corrupt store — start fresh */ }
 }
 
@@ -425,7 +462,7 @@ function fireAlert(price, reason) {
   beep();
   if ("Notification" in window && Notification.permission === "granted") {
     const n = new Notification("WC Final Ticket Alert", {
-      body: msg + "\nClick to open SeatGeek checkout page",
+      body: msg + "\nTap to open SeatGeek and buy",
       requireInteraction: true,
       tag: "wc-ticket-alert"
     });
@@ -437,7 +474,7 @@ function fireAlert(price, reason) {
   }
   if (els.autoOpen.checked && state.eventUrl) {
     const w = window.open(state.eventUrl, "_blank", "noopener");
-    if (!w) log("ALERT", "auto-open blocked by the browser popup blocker — click the Buy button or the notification instead");
+    if (!w) log("ALERT", "auto-open blocked by the browser popup blocker — tap the Buy button or the notification instead");
   }
   if (!titleFlasher) {
     let on = false;
@@ -471,18 +508,18 @@ async function runCycle() {
       }
 
       // Snipe logic: every reason a cheaper ticket may have just been posted
-      const threshold = Number(els.threshold.value);
-      const dropPctCfg = Math.max(0.5, Number(els.dropPct.value) || 5);
+      const threshold = effThreshold();
+      const dropPctCfg = effDropPct();
       const reasons = [];
       if (prevPrice != null && sg.price < prevPrice) {
         const pct = ((prevPrice - sg.price) / prevPrice) * 100;
         if (pct >= dropPctCfg) {
-          reasons.push("fast drop −" + fmtUSD(prevPrice - sg.price) + " (−" + pct.toFixed(1) + "%) since last poll");
+          reasons.push("fast drop −" + fmtUSD(prevPrice - sg.price) + " (−" + pct.toFixed(1) + "%) since last check");
         }
       }
       if (sg.price < threshold) {
         if (prevPrice == null || prevPrice >= threshold) {
-          reasons.push("crossed below " + fmtUSD(threshold));
+          reasons.push("dropped below " + fmtUSD(threshold));
         } else if (prevLow != null && sg.price < prevLow) {
           reasons.push("new low below " + fmtUSD(threshold));
         }
@@ -498,10 +535,10 @@ async function runCycle() {
         }
       }
     } else {
-      log("seatgeek", "event found but stats.lowest_price is null");
+      log("seatgeek", "event found but the lowest price is not published right now");
     }
   } catch (e) {
-    log("seatgeek", "request failed: " + e.message);
+    log("seatgeek", "check failed: " + e.message + " — will retry");
   }
 
   try {
@@ -509,60 +546,91 @@ async function runCycle() {
     if (tm) {
       point.tmMin = tm.min; point.tmMax = tm.max;
       log("ticketmaster", "priceRanges " + fmtUSD(tm.min) + "–" + fmtUSD(tm.max) + " (approximate)");
-    } else if (!els.tmKey.value.trim()) {
-      log("ticketmaster", "skipped — no API key set");
     }
   } catch (e) {
-    log("ticketmaster", "request failed: " + e.message);
+    log("ticketmaster", "check failed: " + e.message + " — will retry");
   }
 
   if (point.price != null || point.tmMin != null) state.history.push(point);
   save();
   renderAll();
+  if (state.running) schedule(); // interval adapts as kickoff approaches
 }
 
 function schedule() {
-  clearInterval(state.timer);
-  const sec = Math.max(30, Number(els.interval.value) || 120);
-  state.timer = setInterval(() => { if (state.running) runCycle(); }, sec * 1000);
+  clearTimeout(state.timer);
+  state.timer = setTimeout(() => { if (state.running) runCycle(); }, effInterval() * 1000);
 }
 
 function setRunning(on) {
   state.running = on;
-  els.toggleBtn.textContent = on ? "Stop" : "Start";
-  els.statuspill.className = "statuspill" + (on ? " live" : "");
-  els.statustext.textContent = on
-    ? "live — every " + Math.max(30, Number(els.interval.value) || 120) + "s"
-    : "paused";
-  if (on) { runCycle(); schedule(); } else { clearInterval(state.timer); }
+  els.toggleBtn.textContent = on ? "Pause" : "Resume";
+  if (on) { runCycle(); } else { clearTimeout(state.timer); renderStatus(); }
 }
 
 /* ------------------------------------------------------------------ */
-/* Rendering — tiles, chart, table                                     */
+/* Rendering                                                           */
 /* ------------------------------------------------------------------ */
-function renderAll() { renderTiles(); renderChart(); renderTable(); }
+function renderAll() { renderStatus(); renderHero(); renderSmartLine(); renderChart(); renderTable(); }
 
-function renderTiles() {
+function renderStatus() {
+  const toKick = fmtToKick();
+  els.kickText.textContent = toKick ? "Kickoff in " + toKick : "Kicked off — prices move fast";
+  els.kickChip.className = "chip" + (toKick ? "" : " hot");
+
+  const below = state.lastPrice != null && state.lastPrice < effThreshold();
+  els.statusChip.className = "chip" + (state.running ? (below ? " hot" : " live") : "");
+  els.statusText.textContent = !state.running
+    ? "paused"
+    : below
+      ? "below alert level — good time to buy"
+      : "watching — checks every " + effInterval() + "s" + (smart() ? " (auto)" : "");
+}
+
+function renderHero() {
   const priced = state.history.filter(p => p.price != null);
   const last = priced[priced.length - 1], prev = priced[priced.length - 2];
 
-  els.tileCurrent.textContent = last ? fmtUSD(last.price) : "—";
+  els.heroPrice.textContent = last ? fmtUSD(last.price) : "—";
   if (last && prev && last.price !== prev.price) {
     const d = last.price - prev.price;
-    els.tileDelta.textContent = (d > 0 ? "▴ +" : "▾ −") + fmtUSD(Math.abs(d)) + " vs last poll";
-    els.tileDelta.className = "delta " + (d < 0 ? "good" : "bad"); // a drop is good
+    els.heroDelta.textContent = (d > 0 ? "▴ up " : "▾ down ") + fmtUSD(Math.abs(d)) + " since last check";
+    els.heroDelta.className = "delta " + (d < 0 ? "good" : "bad"); // a drop is good for buyers
   } else {
-    els.tileDelta.textContent = last ? "no change vs last poll" : "";
-    els.tileDelta.className = "delta";
+    els.heroDelta.textContent = last ? "steady since last check" : "";
+    els.heroDelta.className = "delta";
   }
 
-  els.tileLow.textContent = state.sessionLow != null ? fmtUSD(state.sessionLow) : "—";
-  els.tileLowNote.textContent = "alert below " + fmtUSD(Number(els.threshold.value) || 0);
-
-  els.tileListings.textContent = (last && last.listings != null) ? last.listings.toLocaleString("en-US") : "—";
-
+  const bits = [];
+  if (state.sessionLow != null) bits.push("today's low " + fmtUSD(state.sessionLow));
+  if (last && last.listings != null) bits.push(last.listings.toLocaleString("en-US") + " tickets listed");
   const tmPoint = [...state.history].reverse().find(p => p.tmMin != null);
-  els.tileTM.textContent = tmPoint ? fmtUSD(tmPoint.tmMin) + "–" + fmtUSD(tmPoint.tmMax) : "—";
+  if (tmPoint) bits.push("Ticketmaster " + fmtUSD(tmPoint.tmMin) + "–" + fmtUSD(tmPoint.tmMax) + " (approx)");
+  if (last) bits.push("updated " + fmtTime(last.t));
+  els.heroMeta.textContent = bits.length ? bits.join(" · ") : "Checking prices…";
+}
+
+function renderSmartLine() {
+  if (smart()) {
+    const thr = effThreshold();
+    els.smartLine.innerHTML = "";
+    const strong = s => { const el = document.createElement("strong"); el.textContent = s; return el; };
+    els.smartLine.append(
+      "⚡ Automatic: checking every ", strong(effInterval() + "s"),
+      " (speeds up near kickoff) · alerting below ", strong(fmtUSD(thr)),
+      state.history.filter(p => p.price != null).length ? " (8% under the recent market)" : " (until prices arrive)",
+      " and on sudden drops ≥ ", strong(effDropPct() + "%"), "."
+    );
+  } else {
+    els.smartLine.textContent = "Manual settings in effect — re-enable Automatic below to let the page tune itself.";
+  }
+  // reflect effective values in the (disabled) inputs so Advanced never lies
+  if (smart()) {
+    els.threshold.value = effThreshold();
+    els.interval.value = effInterval();
+    els.dropPct.value = effDropPct();
+  }
+  [els.threshold, els.interval, els.dropPct].forEach(i => i.disabled = smart());
 }
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -583,11 +651,11 @@ function renderChart() {
   els.chartEmpty.style.display = "none";
 
   const W = Math.max(320, els.chartWrap.clientWidth);
-  const H = 260;
-  const pad = { top: 18, right: 88, bottom: 28, left: 56 };
+  const H = 240;
+  const pad = { top: 18, right: 84, bottom: 28, left: 54 };
   const iw = W - pad.left - pad.right, ih = H - pad.top - pad.bottom;
 
-  const threshold = Number(els.threshold.value) || 0;
+  const threshold = effThreshold();
   const prices = points.map(p => p.price);
   let yMin = Math.min(...prices, threshold), yMax = Math.max(...prices, threshold);
   const padY = Math.max((yMax - yMin) * 0.12, yMax * 0.02, 50);
@@ -606,7 +674,6 @@ function renderChart() {
   const series = cssVar("--series-1"), critical = cssVar("--status-critical");
   const surface = cssVar("--surface-1"), inkPrim = cssVar("--text-primary");
 
-  // y gridlines at 4 clean steps
   const steps = 4, rawStep = (yMax - yMin) / steps;
   const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
   const step = Math.ceil(rawStep / mag) * mag;
@@ -619,7 +686,6 @@ function renderChart() {
     svg.appendChild(tick);
   }
 
-  // x baseline + time ticks (first / middle / last)
   svg.appendChild(svgEl("line", { x1: pad.left, x2: W - pad.right, y1: pad.top + ih, y2: pad.top + ih,
     stroke: baseline, "stroke-width": 1 }));
   const tickTimes = points.length > 2 ? [t0, (t0 + t1) / 2, t1] : [t0, t1];
@@ -629,14 +695,12 @@ function renderChart() {
     svg.appendChild(lab);
   });
 
-  // threshold reference — status color, hairline, labeled
   svg.appendChild(svgEl("line", { x1: pad.left, x2: W - pad.right, y1: y(threshold), y2: y(threshold),
     stroke: critical, "stroke-width": 1 }));
   const thLab = svgEl("text", { x: W - pad.right + 6, y: y(threshold) + 4, fill: inkSec, "font-size": 11 });
   thLab.textContent = "alert " + fmtUSD(threshold);
   svg.appendChild(thLab);
 
-  // area wash at ~10% + 2px line, round joins
   const lineD = points.map((p, i) => (i ? "L" : "M") + x(p.t).toFixed(1) + " " + y(p.price).toFixed(1)).join(" ");
   if (points.length > 1) {
     const areaD = lineD + " L" + x(points[points.length - 1].t).toFixed(1) + " " + (pad.top + ih)
@@ -646,7 +710,6 @@ function renderChart() {
       "stroke-linejoin": "round", "stroke-linecap": "round" }));
   }
 
-  // endpoint marker (>=8px) with 2px surface ring + selective direct label
   const lastP = points[points.length - 1];
   svg.appendChild(svgEl("circle", { cx: x(lastP.t), cy: y(lastP.price), r: 6,
     fill: series, stroke: surface, "stroke-width": 2 }));
@@ -655,7 +718,6 @@ function renderChart() {
   endLab.textContent = fmtUSD(lastP.price);
   svg.appendChild(endLab);
 
-  // crosshair + tooltip layer
   const cross = svgEl("line", { x1: 0, x2: 0, y1: pad.top, y2: pad.top + ih,
     stroke: baseline, "stroke-width": 1, visibility: "hidden" });
   svg.appendChild(cross);
@@ -721,34 +783,44 @@ function renderTable() {
 }
 
 /* ------------------------------------------------------------------ */
+/* One-tap enable banner                                               */
+/* ------------------------------------------------------------------ */
+function setupBanner() {
+  const supportsNotif = "Notification" in window;
+  if (supportsNotif && Notification.permission === "granted") return; // sound unlocks on any interaction anyway
+  els.enableBanner.hidden = false;
+  if (!supportsNotif) els.enableBanner.textContent = "🔔 Tap once to turn on sound alerts (this phone can't show web notifications)";
+  els.enableBanner.addEventListener("click", async () => {
+    beep(); // the tap unlocks audio for later alerts
+    if (supportsNotif && Notification.permission === "default") {
+      try { await Notification.requestPermission(); } catch (e) { /* user dismissed */ }
+    }
+    els.enableBanner.hidden = true;
+    log("monitor", "sound " + (supportsNotif && Notification.permission === "granted"
+      ? "+ notifications enabled" : "enabled (notifications unavailable or blocked)"));
+  }, { once: true });
+}
+
+/* ------------------------------------------------------------------ */
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 els.toggleBtn.addEventListener("click", () => setRunning(!state.running));
-els.notifyBtn.addEventListener("click", async () => {
-  beep(); // user gesture unlocks audio for later alerts
-  if (!("Notification" in window)) { els.notifyBtn.textContent = "Notifications unsupported"; return; }
-  const perm = await Notification.requestPermission();
-  els.notifyBtn.textContent = perm === "granted" ? "Notifications on" : "Notifications blocked";
-});
-els.interval.addEventListener("change", () => { save(); if (state.running) setRunning(true); });
-els.snipeMode.addEventListener("change", () => {
-  els.interval.value = els.snipeMode.checked ? 30 : 120;
-  if (els.snipeMode.checked) els.autoOpen.checked = true;
-  save();
-  if (state.running) setRunning(true);
-  log("monitor", els.snipeMode.checked
-    ? "snipe mode ON — polling every 30s, auto-open enabled"
-    : "snipe mode off — polling every 120s");
+els.smartMode.addEventListener("change", () => {
+  save(); renderAll();
+  log("monitor", els.smartMode.checked ? "automatic mode ON" : "manual settings ON");
+  if (state.running) schedule();
 });
 els.autoOpen.addEventListener("change", save);
-[els.threshold, els.dropPct, els.tmKey].forEach(el => el.addEventListener("change", () => { save(); renderAll(); }));
+[els.threshold, els.interval, els.dropPct, els.tmKey].forEach(el =>
+  el.addEventListener("change", () => { save(); renderAll(); if (state.running) schedule(); }));
 window.addEventListener("resize", () => renderChart());
+setInterval(renderStatus, 30 * 1000); // keep the kickoff countdown fresh
 
 load();
+setupBanner();
 renderAll();
 if (state.history.length) log("monitor", "restored " + state.history.length + " earlier data point(s) from this browser");
-log("monitor", "watching WC Final " + EVENT_DATE + " @ MetLife | alert below "
-  + fmtUSD(Number(els.threshold.value)) + " | every " + els.interval.value + "s");
+log("monitor", "watching WC Final " + EVENT_DATE + " @ MetLife" + (smart() ? " — automatic mode" : ""));
 setRunning(true);
 </script>
 </body>
