@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WC Final Ticket Watch</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --status-good:    #0ca30c;
+    --status-critical:#d03b3b;
+    --delta-good:     #006300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:           #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --delta-good:     #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:           #0d0d0d;
+    --surface-1:      #1a1a19;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --delta-good:     #0ca30c;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+
+  header h1 { font-size: 22px; margin: 0 0 2px; }
+  header .sub { color: var(--text-secondary); margin: 0 0 20px; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Controls — one row above everything they scope */
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+  .controls input {
+    font: inherit; color: var(--text-primary);
+    background: var(--page); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 8px; width: 120px;
+  }
+  .controls input#tmKey { width: 220px; }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 7px 14px; background: var(--surface-1); color: var(--text-primary);
+  }
+  button.primary { background: var(--series-1); border-color: transparent; color: #fff; }
+  .statuspill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-secondary); padding: 6px 0 7px;
+  }
+  .statuspill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+  .statuspill.live .dot { background: var(--status-good); }
+  .statuspill.alert .dot { background: var(--status-critical); }
+
+  /* Stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .tile .value { font-size: 26px; font-weight: 600; }
+  .tile .delta { font-size: 12px; margin-top: 2px; color: var(--text-muted); }
+  .tile .delta.good { color: var(--delta-good); }
+  .tile .delta.bad  { color: var(--status-critical); }
+  .tile .note { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Chart */
+  .chart-card h2, .log-card h2, details.card summary {
+    font-size: 14px; font-weight: 600; margin: 0 0 10px; color: var(--text-primary);
+  }
+  .chart-wrap { position: relative; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .chart-empty { color: var(--text-muted); font-size: 13px; padding: 40px 0; text-align: center; }
+  .tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.12);
+    min-width: 130px; z-index: 2;
+  }
+  .tooltip .tt-time { color: var(--text-secondary); margin-bottom: 4px; }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tooltip .tt-key { width: 12px; height: 0; border-top: 2px solid var(--series-1); }
+  .tooltip .tt-val { font-weight: 700; }
+  .tooltip .tt-sub { color: var(--text-secondary); }
+
+  /* Log */
+  .log {
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--text-secondary);
+    max-height: 260px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .log .alertline { color: var(--status-critical); font-weight: 700; }
+
+  /* Table view */
+  details.card summary { cursor: pointer; margin: 0; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; }
+  th { text-align: left; color: var(--text-secondary); font-weight: 600; }
+  th, td { padding: 5px 10px 5px 0; border-bottom: 1px solid var(--gridline); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .foot { font-size: 12px; color: var(--text-muted); margin-top: 24px; }
+  .foot a { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>World Cup Final ticket watch</h1>
+    <p class="sub">Spain vs Argentina &middot; MetLife Stadium &middot; July 19, 2026 &middot; polls SeatGeek + Ticketmaster from your browser</p>
+  </header>
+
+  <section class="card">
+    <div class="controls">
+      <label>Alert below (USD)
+        <input id="threshold" type="number" min="0" step="100" value="8000">
+      </label>
+      <label>Poll every (seconds)
+        <input id="interval" type="number" min="30" step="10" value="120">
+      </label>
+      <label>Ticketmaster API key (optional, stays in this browser)
+        <input id="tmKey" type="password" placeholder="paste Discovery key" autocomplete="off">
+      </label>
+      <button id="notifyBtn" type="button">Enable notifications</button>
+      <button id="toggleBtn" class="primary" type="button">Stop</button>
+      <span id="statuspill" class="statuspill"><span class="dot"></span><span id="statustext">starting&hellip;</span></span>
+    </div>
+  </section>
+
+  <section class="tiles">
+    <div class="tile">
+      <div class="label">Current get-in (SeatGeek)</div>
+      <div class="value" id="tileCurrent">&mdash;</div>
+      <div class="delta" id="tileDelta"></div>
+    </div>
+    <div class="tile">
+      <div class="label">Session low</div>
+      <div class="value" id="tileLow">&mdash;</div>
+      <div class="delta" id="tileLowNote"></div>
+    </div>
+    <div class="tile">
+      <div class="label">Listings (SeatGeek)</div>
+      <div class="value" id="tileListings">&mdash;</div>
+    </div>
+    <div class="tile">
+      <div class="label">Ticketmaster range</div>
+      <div class="value" id="tileTM">&mdash;</div>
+      <div class="note">approximate &mdash; Discovery data can be stale for resale</div>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <h2>SeatGeek get-in price</h2>
+    <div class="chart-wrap" id="chartWrap">
+      <div class="chart-empty" id="chartEmpty">Waiting for the first poll&hellip;</div>
+      <div class="tooltip" id="tooltip">
+        <div class="tt-time"></div>
+        <div class="tt-row"><span class="tt-key"></span><span class="tt-val"></span></div>
+        <div class="tt-sub"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card log-card">
+    <h2>Log</h2>
+    <div class="log" id="log" aria-live="polite"></div>
+  </section>
+
+  <details class="card">
+    <summary>History table</summary>
+    <table>
+      <thead><tr>
+        <th>Time</th><th class="num">Get-in</th><th class="num">Listings</th>
+        <th class="num">TM min</th><th class="num">TM max</th>
+      </tr></thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </details>
+
+  <p class="foot">
+    Alerts fire once when the SeatGeek get-in crosses below the threshold, then re-arm if it climbs back above.
+    Keep this tab open; the poll runs in your browser. Data &copy; SeatGeek / Ticketmaster.
+  </p>
+</div>
+
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------ */
+/* Config & state                                                      */
+/* ------------------------------------------------------------------ */
+const SEATGEEK_CLIENT_ID = "NTk3MzgwNzR8MTc4NDQ4MDc0OC4xNTk4NDQy";
+const EVENT_DATE = "2026-07-19";
+const VENUE_KEYWORD = "metlife";
+const STORE_KEY = "wcwatch-" + EVENT_DATE;
+
+const els = {};
+["threshold","interval","tmKey","notifyBtn","toggleBtn","statuspill","statustext",
+ "tileCurrent","tileDelta","tileLow","tileLowNote","tileListings","tileTM",
+ "chartWrap","chartEmpty","tooltip","log","historyBody"]
+  .forEach(id => els[id] = document.getElementById(id));
+
+const state = {
+  history: [],        // {t: epoch-ms, price, listings, tmMin, tmMax}
+  sessionLow: null,
+  alerted: false,
+  running: false,
+  timer: null,
+  audioCtx: null
+};
+
+/* Persistence: survive a tab reload on match day */
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      history: state.history.slice(-500),
+      sessionLow: state.sessionLow,
+      alerted: state.alerted,
+      threshold: els.threshold.value,
+      interval: els.interval.value,
+      tmKey: els.tmKey.value
+    }));
+  } catch (e) { /* storage full/blocked — monitoring still works */ }
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    state.history = Array.isArray(s.history) ? s.history : [];
+    state.sessionLow = typeof s.sessionLow === "number" ? s.sessionLow : null;
+    state.alerted = !!s.alerted;
+    if (s.threshold) els.threshold.value = s.threshold;
+    if (s.interval) els.interval.value = s.interval;
+    if (s.tmKey) els.tmKey.value = s.tmKey;
+  } catch (e) { /* corrupt store — start fresh */ }
+}
+
+const fmtUSD = n => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const fmtTime = t => new Date(t).toLocaleTimeString("en-US", { hour12: false });
+
+function log(source, message, isAlert) {
+  const line = document.createElement("div");
+  if (isAlert) line.className = "alertline";
+  line.textContent = "[" + fmtTime(Date.now()) + "] [" + source + "] " + message;
+  els.log.appendChild(line);
+  while (els.log.childElementCount > 300) els.log.removeChild(els.log.firstChild);
+  els.log.scrollTop = els.log.scrollHeight;
+}
+
+/* ------------------------------------------------------------------ */
+/* Data sources                                                        */
+/* ------------------------------------------------------------------ */
+let jsonpSeq = 0;
+function jsonp(url, param) {
+  return new Promise((resolve, reject) => {
+    const cb = "wcwatch_cb_" + (jsonpSeq++);
+    const s = document.createElement("script");
+    const timer = setTimeout(() => { cleanup(); reject(new Error("JSONP timeout")); }, 15000);
+    function cleanup() { clearTimeout(timer); delete window[cb]; s.remove(); }
+    window[cb] = data => { cleanup(); resolve(data); };
+    s.onerror = () => { cleanup(); reject(new Error("JSONP load failed")); };
+    s.src = url + "&" + param + "=" + cb;
+    document.head.appendChild(s);
+  });
+}
+
+async function getJson(url) {
+  const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  return resp.json();
+}
+
+async function pollSeatGeek() {
+  const url = "https://api.seatgeek.com/2/events"
+    + "?client_id=" + encodeURIComponent(SEATGEEK_CLIENT_ID)
+    + "&q=" + encodeURIComponent("world cup final")
+    + "&datetime_local.gte=" + EVENT_DATE
+    + "&datetime_local.lte=" + EVENT_DATE + "T23:59:59"
+    + "&per_page=25";
+  let data;
+  try {
+    data = await getJson(url);
+  } catch (e) {
+    data = await jsonp(url, "callback"); // CORS blocked → SeatGeek supports JSONP
+  }
+  const events = (data && data.events) || [];
+  for (const ev of events) {
+    const venue = ((ev.venue && ev.venue.name) || "").toLowerCase();
+    if (venue.includes(VENUE_KEYWORD)) {
+      const stats = ev.stats || {};
+      return { price: stats.lowest_price, listings: stats.listing_count };
+    }
+  }
+  throw new Error("no event matched venue '" + VENUE_KEYWORD + "' among " + events.length + " result(s)");
+}
+
+async function pollTicketmaster() {
+  const key = els.tmKey.value.trim();
+  if (!key) return null;
+  const url = "https://app.ticketmaster.com/discovery/v2/events.json"
+    + "?apikey=" + encodeURIComponent(key)
+    + "&keyword=" + encodeURIComponent("FIFA World Cup Final")
+    + "&startDateTime=" + EVENT_DATE + "T00:00:00Z"
+    + "&endDateTime=" + EVENT_DATE + "T23:59:59Z"
+    + "&size=25";
+  const data = await getJson(url);
+  const events = (data._embedded && data._embedded.events) || [];
+  for (const ev of events) {
+    const venues = (ev._embedded && ev._embedded.venues) || [];
+    const names = venues.map(v => v.name || "").join(" ").toLowerCase();
+    if (!names.includes(VENUE_KEYWORD)) continue;
+    const pr = (ev.priceRanges || [])[0];
+    if (pr) return { min: pr.min, max: pr.max };
+    log("ticketmaster", "event found but no priceRanges in response");
+    return null;
+  }
+  log("ticketmaster", "no event matched venue '" + VENUE_KEYWORD + "' among " + events.length + " result(s)");
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Alerting                                                            */
+/* ------------------------------------------------------------------ */
+function beep() {
+  try {
+    if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = state.audioCtx;
+    if (ctx.state === "suspended") ctx.resume();
+    [0, 0.25, 0.5].forEach(offset => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      const t0 = ctx.currentTime + offset;
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.3, t0 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
+      osc.start(t0); osc.stop(t0 + 0.22);
+    });
+  } catch (e) { /* no audio — notification + title still fire */ }
+}
+
+let titleFlasher = null;
+function fireAlert(price) {
+  const msg = "WC Final get-in dropped to " + fmtUSD(price)
+    + " (below " + fmtUSD(Number(els.threshold.value)) + ")";
+  log("ALERT", msg, true);
+  beep();
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("WC Final Ticket Alert", { body: msg });
+  }
+  if (!titleFlasher) {
+    let on = false;
+    titleFlasher = setInterval(() => {
+      document.title = (on = !on) ? "🔻 " + fmtUSD(price) + " — WC WATCH" : "WC Final Ticket Watch";
+    }, 1000);
+    const stop = () => { clearInterval(titleFlasher); titleFlasher = null; document.title = "WC Final Ticket Watch"; };
+    window.addEventListener("focus", stop, { once: true });
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Poll cycle                                                          */
+/* ------------------------------------------------------------------ */
+async function runCycle() {
+  const point = { t: Date.now(), price: null, listings: null, tmMin: null, tmMax: null };
+
+  try {
+    const sg = await pollSeatGeek();
+    if (sg.price != null) {
+      point.price = sg.price;
+      point.listings = sg.listings;
+      log("seatgeek", "get-in " + fmtUSD(sg.price) + " | " + (sg.listings ?? "?") + " listings");
+      if (state.sessionLow === null || sg.price < state.sessionLow) {
+        state.sessionLow = sg.price;
+        log("seatgeek", "*** new session low: " + fmtUSD(sg.price) + " ***");
+      }
+      const threshold = Number(els.threshold.value);
+      if (sg.price < threshold && !state.alerted) {
+        fireAlert(sg.price);
+        state.alerted = true;
+      } else if (sg.price >= threshold) {
+        state.alerted = false; // re-arm if price climbs back up
+      }
+    } else {
+      log("seatgeek", "event found but stats.lowest_price is null");
+    }
+  } catch (e) {
+    log("seatgeek", "request failed: " + e.message);
+  }
+
+  try {
+    const tm = await pollTicketmaster();
+    if (tm) {
+      point.tmMin = tm.min; point.tmMax = tm.max;
+      log("ticketmaster", "priceRanges " + fmtUSD(tm.min) + "–" + fmtUSD(tm.max) + " (approximate)");
+    } else if (!els.tmKey.value.trim()) {
+      log("ticketmaster", "skipped — no API key set");
+    }
+  } catch (e) {
+    log("ticketmaster", "request failed: " + e.message);
+  }
+
+  if (point.price != null || point.tmMin != null) state.history.push(point);
+  save();
+  renderAll();
+}
+
+function schedule() {
+  clearInterval(state.timer);
+  const sec = Math.max(30, Number(els.interval.value) || 120);
+  state.timer = setInterval(() => { if (state.running) runCycle(); }, sec * 1000);
+}
+
+function setRunning(on) {
+  state.running = on;
+  els.toggleBtn.textContent = on ? "Stop" : "Start";
+  els.statuspill.className = "statuspill" + (on ? " live" : "");
+  els.statustext.textContent = on
+    ? "live — every " + Math.max(30, Number(els.interval.value) || 120) + "s"
+    : "paused";
+  if (on) { runCycle(); schedule(); } else { clearInterval(state.timer); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Rendering — tiles, chart, table                                     */
+/* ------------------------------------------------------------------ */
+function renderAll() { renderTiles(); renderChart(); renderTable(); }
+
+function renderTiles() {
+  const priced = state.history.filter(p => p.price != null);
+  const last = priced[priced.length - 1], prev = priced[priced.length - 2];
+
+  els.tileCurrent.textContent = last ? fmtUSD(last.price) : "—";
+  if (last && prev && last.price !== prev.price) {
+    const d = last.price - prev.price;
+    els.tileDelta.textContent = (d > 0 ? "▴ +" : "▾ −") + fmtUSD(Math.abs(d)) + " vs last poll";
+    els.tileDelta.className = "delta " + (d < 0 ? "good" : "bad"); // a drop is good
+  } else {
+    els.tileDelta.textContent = last ? "no change vs last poll" : "";
+    els.tileDelta.className = "delta";
+  }
+
+  els.tileLow.textContent = state.sessionLow != null ? fmtUSD(state.sessionLow) : "—";
+  els.tileLowNote.textContent = "alert below " + fmtUSD(Number(els.threshold.value) || 0);
+
+  els.tileListings.textContent = (last && last.listings != null) ? last.listings.toLocaleString("en-US") : "—";
+
+  const tmPoint = [...state.history].reverse().find(p => p.tmMin != null);
+  els.tileTM.textContent = tmPoint ? fmtUSD(tmPoint.tmMin) + "–" + fmtUSD(tmPoint.tmMax) : "—";
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+function svgEl(name, attrs) {
+  const el = document.createElementNS(SVG_NS, name);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function renderChart() {
+  const points = state.history.filter(p => p.price != null);
+  const old = els.chartWrap.querySelector("svg");
+  if (old) old.remove();
+  if (points.length === 0) { els.chartEmpty.style.display = ""; return; }
+  els.chartEmpty.style.display = "none";
+
+  const W = Math.max(320, els.chartWrap.clientWidth);
+  const H = 260;
+  const pad = { top: 18, right: 88, bottom: 28, left: 56 };
+  const iw = W - pad.left - pad.right, ih = H - pad.top - pad.bottom;
+
+  const threshold = Number(els.threshold.value) || 0;
+  const prices = points.map(p => p.price);
+  let yMin = Math.min(...prices, threshold), yMax = Math.max(...prices, threshold);
+  const padY = Math.max((yMax - yMin) * 0.12, yMax * 0.02, 50);
+  yMin = Math.max(0, yMin - padY); yMax += padY;
+
+  const t0 = points[0].t;
+  const t1 = Math.max(points[points.length - 1].t, t0 + 10 * 60 * 1000);
+  const x = t => pad.left + ((t - t0) / (t1 - t0)) * iw;
+  const y = v => pad.top + ih - ((v - yMin) / (yMax - yMin)) * ih;
+
+  const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
+    "aria-label": "SeatGeek get-in price over time" });
+
+  const inkMuted = cssVar("--text-muted"), inkSec = cssVar("--text-secondary");
+  const grid = cssVar("--gridline"), baseline = cssVar("--baseline");
+  const series = cssVar("--series-1"), critical = cssVar("--status-critical");
+  const surface = cssVar("--surface-1"), inkPrim = cssVar("--text-primary");
+
+  // y gridlines at 4 clean steps
+  const steps = 4, rawStep = (yMax - yMin) / steps;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const step = Math.ceil(rawStep / mag) * mag;
+  for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) {
+    svg.appendChild(svgEl("line", { x1: pad.left, x2: W - pad.right, y1: y(v), y2: y(v),
+      stroke: grid, "stroke-width": 1 }));
+    const tick = svgEl("text", { x: pad.left - 8, y: y(v) + 4, "text-anchor": "end",
+      fill: inkMuted, "font-size": 11, style: "font-variant-numeric: tabular-nums" });
+    tick.textContent = "$" + v.toLocaleString("en-US");
+    svg.appendChild(tick);
+  }
+
+  // x baseline + time ticks (first / middle / last)
+  svg.appendChild(svgEl("line", { x1: pad.left, x2: W - pad.right, y1: pad.top + ih, y2: pad.top + ih,
+    stroke: baseline, "stroke-width": 1 }));
+  const tickTimes = points.length > 2 ? [t0, (t0 + t1) / 2, t1] : [t0, t1];
+  tickTimes.forEach(t => {
+    const lab = svgEl("text", { x: x(t), y: H - 8, "text-anchor": "middle", fill: inkMuted, "font-size": 11 });
+    lab.textContent = new Date(t).toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+    svg.appendChild(lab);
+  });
+
+  // threshold reference — status color, hairline, labeled
+  svg.appendChild(svgEl("line", { x1: pad.left, x2: W - pad.right, y1: y(threshold), y2: y(threshold),
+    stroke: critical, "stroke-width": 1 }));
+  const thLab = svgEl("text", { x: W - pad.right + 6, y: y(threshold) + 4, fill: inkSec, "font-size": 11 });
+  thLab.textContent = "alert " + fmtUSD(threshold);
+  svg.appendChild(thLab);
+
+  // area wash at ~10% + 2px line, round joins
+  const lineD = points.map((p, i) => (i ? "L" : "M") + x(p.t).toFixed(1) + " " + y(p.price).toFixed(1)).join(" ");
+  if (points.length > 1) {
+    const areaD = lineD + " L" + x(points[points.length - 1].t).toFixed(1) + " " + (pad.top + ih)
+      + " L" + x(points[0].t).toFixed(1) + " " + (pad.top + ih) + " Z";
+    svg.appendChild(svgEl("path", { d: areaD, fill: series, "fill-opacity": 0.1 }));
+    svg.appendChild(svgEl("path", { d: lineD, fill: "none", stroke: series, "stroke-width": 2,
+      "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  }
+
+  // endpoint marker (>=8px) with 2px surface ring + selective direct label
+  const lastP = points[points.length - 1];
+  svg.appendChild(svgEl("circle", { cx: x(lastP.t), cy: y(lastP.price), r: 6,
+    fill: series, stroke: surface, "stroke-width": 2 }));
+  const endLab = svgEl("text", { x: x(lastP.t) + 10, y: y(lastP.price) + 4,
+    fill: inkPrim, "font-size": 12, "font-weight": 600 });
+  endLab.textContent = fmtUSD(lastP.price);
+  svg.appendChild(endLab);
+
+  // crosshair + tooltip layer
+  const cross = svgEl("line", { x1: 0, x2: 0, y1: pad.top, y2: pad.top + ih,
+    stroke: baseline, "stroke-width": 1, visibility: "hidden" });
+  svg.appendChild(cross);
+  const hoverDot = svgEl("circle", { r: 5, fill: series, stroke: surface, "stroke-width": 2, visibility: "hidden" });
+  svg.appendChild(hoverDot);
+
+  const hit = svgEl("rect", { x: pad.left, y: pad.top, width: iw, height: ih,
+    fill: "transparent", style: "cursor: crosshair" });
+  hit.addEventListener("pointermove", ev => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    let best = 0, bestD = Infinity;
+    points.forEach((p, i) => {
+      const d = Math.abs(x(p.t) - px);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    const p = points[best], cx = x(p.t), cy = y(p.price);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx);
+    cross.setAttribute("visibility", "visible");
+    hoverDot.setAttribute("cx", cx); hoverDot.setAttribute("cy", cy);
+    hoverDot.setAttribute("visibility", "visible");
+
+    els.tooltip.querySelector(".tt-time").textContent = fmtTime(p.t);
+    els.tooltip.querySelector(".tt-val").textContent = fmtUSD(p.price);
+    els.tooltip.querySelector(".tt-sub").textContent =
+      (p.listings != null ? p.listings.toLocaleString("en-US") + " listings" : "") +
+      (p.tmMin != null ? "  ·  TM " + fmtUSD(p.tmMin) + "–" + fmtUSD(p.tmMax) : "");
+    els.tooltip.style.display = "block";
+    const wrapRect = els.chartWrap.getBoundingClientRect();
+    const ttX = (cx / W) * wrapRect.width;
+    els.tooltip.style.left = Math.min(ttX + 14, wrapRect.width - 150) + "px";
+    els.tooltip.style.top = Math.max(0, (cy / H) * wrapRect.height - 60) + "px";
+  });
+  hit.addEventListener("pointerleave", () => {
+    cross.setAttribute("visibility", "hidden");
+    hoverDot.setAttribute("visibility", "hidden");
+    els.tooltip.style.display = "none";
+  });
+  svg.appendChild(hit);
+
+  els.chartWrap.appendChild(svg);
+}
+
+function renderTable() {
+  els.historyBody.replaceChildren();
+  [...state.history].reverse().slice(0, 200).forEach(p => {
+    const tr = document.createElement("tr");
+    const cells = [
+      [fmtTime(p.t), ""],
+      [p.price != null ? fmtUSD(p.price) : "—", "num"],
+      [p.listings != null ? p.listings.toLocaleString("en-US") : "—", "num"],
+      [p.tmMin != null ? fmtUSD(p.tmMin) : "—", "num"],
+      [p.tmMax != null ? fmtUSD(p.tmMax) : "—", "num"]
+    ];
+    cells.forEach(([text, cls]) => {
+      const td = document.createElement("td");
+      if (cls) td.className = cls;
+      td.textContent = text;
+      tr.appendChild(td);
+    });
+    els.historyBody.appendChild(tr);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Wiring                                                              */
+/* ------------------------------------------------------------------ */
+els.toggleBtn.addEventListener("click", () => setRunning(!state.running));
+els.notifyBtn.addEventListener("click", async () => {
+  beep(); // user gesture unlocks audio for later alerts
+  if (!("Notification" in window)) { els.notifyBtn.textContent = "Notifications unsupported"; return; }
+  const perm = await Notification.requestPermission();
+  els.notifyBtn.textContent = perm === "granted" ? "Notifications on" : "Notifications blocked";
+});
+els.interval.addEventListener("change", () => { save(); if (state.running) { schedule(); setRunning(true); } });
+[els.threshold, els.tmKey].forEach(el => el.addEventListener("change", () => { save(); renderAll(); }));
+window.addEventListener("resize", () => renderChart());
+
+load();
+renderAll();
+if (state.history.length) log("monitor", "restored " + state.history.length + " earlier data point(s) from this browser");
+log("monitor", "watching WC Final " + EVENT_DATE + " @ MetLife | alert below "
+  + fmtUSD(Number(els.threshold.value)) + " | every " + els.interval.value + "s");
+setRunning(true);
+</script>
+</body>
+</html>
