@@ -78,6 +78,17 @@
     padding: 6px 8px; width: 120px;
   }
   .controls input#tmKey { width: 220px; }
+  .controls input#dropPct { width: 70px; }
+  .controls label.check {
+    flex-direction: row; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-primary); padding-bottom: 8px;
+  }
+  .controls label.check input { width: auto; margin: 0; }
+  a.buy {
+    display: inline-block; text-decoration: none;
+    font-weight: 700; border-radius: 6px; padding: 7px 14px;
+    background: var(--status-good); color: #fff;
+  }
   button {
     font: inherit; font-weight: 600; cursor: pointer;
     border: 1px solid var(--border); border-radius: 6px;
@@ -159,8 +170,14 @@
       <label>Ticketmaster API key (optional, stays in this browser)
         <input id="tmKey" type="password" placeholder="paste Discovery key" autocomplete="off">
       </label>
+      <label>Fast-drop alert (%)
+        <input id="dropPct" type="number" min="0.5" step="0.5" value="5">
+      </label>
+      <label class="check"><input id="snipeMode" type="checkbox"> Snipe mode (poll 30s, auto-open)</label>
+      <label class="check"><input id="autoOpen" type="checkbox"> Auto-open SeatGeek on alert</label>
       <button id="notifyBtn" type="button">Enable notifications</button>
       <button id="toggleBtn" class="primary" type="button">Stop</button>
+      <a id="buyBtn" class="buy" href="#" target="_blank" rel="noopener" hidden>Buy on SeatGeek ↗</a>
       <span id="statuspill" class="statuspill"><span class="dot"></span><span id="statustext">starting&hellip;</span></span>
     </div>
   </section>
@@ -216,8 +233,11 @@
   </details>
 
   <p class="foot">
-    Alerts fire once when the SeatGeek get-in crosses below the threshold, then re-arm if it climbs back above.
-    Keep this tab open; the poll runs in your browser. Data &copy; SeatGeek / Ticketmaster.
+    Alerts fire on every new session low below the threshold and on any fast drop (likely a panic-sell listing),
+    with a 30-second cooldown between bursts. Clicking an alert notification (or the Buy button) opens the
+    SeatGeek page for the event &mdash; the public API only exposes the aggregate get-in price, not individual
+    listings, so the final seat pick happens on SeatGeek. Keep this tab open; the poll runs in your browser.
+    Data &copy; SeatGeek / Ticketmaster.
   </p>
 </div>
 
@@ -233,15 +253,20 @@ const VENUE_KEYWORD = "metlife";
 const STORE_KEY = "wcwatch-" + EVENT_DATE;
 
 const els = {};
-["threshold","interval","tmKey","notifyBtn","toggleBtn","statuspill","statustext",
+["threshold","interval","tmKey","dropPct","snipeMode","autoOpen","buyBtn",
+ "notifyBtn","toggleBtn","statuspill","statustext",
  "tileCurrent","tileDelta","tileLow","tileLowNote","tileListings","tileTM",
  "chartWrap","chartEmpty","tooltip","log","historyBody"]
   .forEach(id => els[id] = document.getElementById(id));
 
+const ALERT_COOLDOWN_MS = 30 * 1000; // min gap between alert bursts
+
 const state = {
   history: [],        // {t: epoch-ms, price, listings, tmMin, tmMax}
   sessionLow: null,
-  alerted: false,
+  lastPrice: null,
+  lastAlertAt: 0,
+  eventUrl: null,     // SeatGeek buy page for the matched event
   running: false,
   timer: null,
   audioCtx: null
@@ -253,10 +278,14 @@ function save() {
     localStorage.setItem(STORE_KEY, JSON.stringify({
       history: state.history.slice(-500),
       sessionLow: state.sessionLow,
-      alerted: state.alerted,
+      lastPrice: state.lastPrice,
+      eventUrl: state.eventUrl,
       threshold: els.threshold.value,
       interval: els.interval.value,
-      tmKey: els.tmKey.value
+      tmKey: els.tmKey.value,
+      dropPct: els.dropPct.value,
+      autoOpen: els.autoOpen.checked,
+      snipeMode: els.snipeMode.checked
     }));
   } catch (e) { /* storage full/blocked — monitoring still works */ }
 }
@@ -267,10 +296,14 @@ function load() {
     const s = JSON.parse(raw);
     state.history = Array.isArray(s.history) ? s.history : [];
     state.sessionLow = typeof s.sessionLow === "number" ? s.sessionLow : null;
-    state.alerted = !!s.alerted;
+    state.lastPrice = typeof s.lastPrice === "number" ? s.lastPrice : null;
+    if (typeof s.eventUrl === "string" && /^https:\/\/seatgeek\.com\//.test(s.eventUrl)) setEventUrl(s.eventUrl);
     if (s.threshold) els.threshold.value = s.threshold;
     if (s.interval) els.interval.value = s.interval;
     if (s.tmKey) els.tmKey.value = s.tmKey;
+    if (s.dropPct) els.dropPct.value = s.dropPct;
+    els.autoOpen.checked = !!s.autoOpen;
+    els.snipeMode.checked = !!s.snipeMode;
   } catch (e) { /* corrupt store — start fresh */ }
 }
 
@@ -327,7 +360,7 @@ async function pollSeatGeek() {
     const venue = ((ev.venue && ev.venue.name) || "").toLowerCase();
     if (venue.includes(VENUE_KEYWORD)) {
       const stats = ev.stats || {};
-      return { price: stats.lowest_price, listings: stats.listing_count };
+      return { price: stats.lowest_price, listings: stats.listing_count, url: ev.url };
     }
   }
   throw new Error("no event matched venue '" + VENUE_KEYWORD + "' among " + events.length + " result(s)");
@@ -378,14 +411,33 @@ function beep() {
   } catch (e) { /* no audio — notification + title still fire */ }
 }
 
+function setEventUrl(url) {
+  if (typeof url !== "string" || !/^https:\/\/seatgeek\.com\//.test(url)) return;
+  state.eventUrl = url;
+  els.buyBtn.href = url;
+  els.buyBtn.hidden = false;
+}
+
 let titleFlasher = null;
-function fireAlert(price) {
-  const msg = "WC Final get-in dropped to " + fmtUSD(price)
-    + " (below " + fmtUSD(Number(els.threshold.value)) + ")";
-  log("ALERT", msg, true);
+function fireAlert(price, reason) {
+  const msg = "WC Final get-in " + fmtUSD(price) + " — " + reason;
+  log("ALERT", msg + (state.eventUrl ? "  → " + state.eventUrl : ""), true);
   beep();
   if ("Notification" in window && Notification.permission === "granted") {
-    new Notification("WC Final Ticket Alert", { body: msg });
+    const n = new Notification("WC Final Ticket Alert", {
+      body: msg + "\nClick to open SeatGeek checkout page",
+      requireInteraction: true,
+      tag: "wc-ticket-alert"
+    });
+    n.onclick = () => {
+      window.focus();
+      if (state.eventUrl) window.open(state.eventUrl, "_blank", "noopener");
+      n.close();
+    };
+  }
+  if (els.autoOpen.checked && state.eventUrl) {
+    const w = window.open(state.eventUrl, "_blank", "noopener");
+    if (!w) log("ALERT", "auto-open blocked by the browser popup blocker — click the Buy button or the notification instead");
   }
   if (!titleFlasher) {
     let on = false;
@@ -405,20 +457,45 @@ async function runCycle() {
 
   try {
     const sg = await pollSeatGeek();
+    setEventUrl(sg.url);
     if (sg.price != null) {
       point.price = sg.price;
       point.listings = sg.listings;
       log("seatgeek", "get-in " + fmtUSD(sg.price) + " | " + (sg.listings ?? "?") + " listings");
-      if (state.sessionLow === null || sg.price < state.sessionLow) {
+
+      const prevPrice = state.lastPrice;
+      const prevLow = state.sessionLow;
+      if (prevLow === null || sg.price < prevLow) {
         state.sessionLow = sg.price;
-        log("seatgeek", "*** new session low: " + fmtUSD(sg.price) + " ***");
+        if (prevLow !== null) log("seatgeek", "*** new session low: " + fmtUSD(sg.price) + " ***");
       }
+
+      // Snipe logic: every reason a cheaper ticket may have just been posted
       const threshold = Number(els.threshold.value);
-      if (sg.price < threshold && !state.alerted) {
-        fireAlert(sg.price);
-        state.alerted = true;
-      } else if (sg.price >= threshold) {
-        state.alerted = false; // re-arm if price climbs back up
+      const dropPctCfg = Math.max(0.5, Number(els.dropPct.value) || 5);
+      const reasons = [];
+      if (prevPrice != null && sg.price < prevPrice) {
+        const pct = ((prevPrice - sg.price) / prevPrice) * 100;
+        if (pct >= dropPctCfg) {
+          reasons.push("fast drop −" + fmtUSD(prevPrice - sg.price) + " (−" + pct.toFixed(1) + "%) since last poll");
+        }
+      }
+      if (sg.price < threshold) {
+        if (prevPrice == null || prevPrice >= threshold) {
+          reasons.push("crossed below " + fmtUSD(threshold));
+        } else if (prevLow != null && sg.price < prevLow) {
+          reasons.push("new low below " + fmtUSD(threshold));
+        }
+      }
+      state.lastPrice = sg.price;
+
+      if (reasons.length) {
+        if (Date.now() - state.lastAlertAt >= ALERT_COOLDOWN_MS) {
+          state.lastAlertAt = Date.now();
+          fireAlert(sg.price, reasons.join("; "));
+        } else {
+          log("seatgeek", "alert condition (" + reasons.join("; ") + ") suppressed — cooldown");
+        }
       }
     } else {
       log("seatgeek", "event found but stats.lowest_price is null");
@@ -653,8 +730,18 @@ els.notifyBtn.addEventListener("click", async () => {
   const perm = await Notification.requestPermission();
   els.notifyBtn.textContent = perm === "granted" ? "Notifications on" : "Notifications blocked";
 });
-els.interval.addEventListener("change", () => { save(); if (state.running) { schedule(); setRunning(true); } });
-[els.threshold, els.tmKey].forEach(el => el.addEventListener("change", () => { save(); renderAll(); }));
+els.interval.addEventListener("change", () => { save(); if (state.running) setRunning(true); });
+els.snipeMode.addEventListener("change", () => {
+  els.interval.value = els.snipeMode.checked ? 30 : 120;
+  if (els.snipeMode.checked) els.autoOpen.checked = true;
+  save();
+  if (state.running) setRunning(true);
+  log("monitor", els.snipeMode.checked
+    ? "snipe mode ON — polling every 30s, auto-open enabled"
+    : "snipe mode off — polling every 120s");
+});
+els.autoOpen.addEventListener("change", save);
+[els.threshold, els.dropPct, els.tmKey].forEach(el => el.addEventListener("change", () => { save(); renderAll(); }));
 window.addEventListener("resize", () => renderChart());
 
 load();
