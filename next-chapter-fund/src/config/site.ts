@@ -91,7 +91,7 @@ export const home = {
   hero: {
     eyebrow: "The Next Chapter Fund",
     headline:
-      "Shakira helped the world discover them. Together, we can help them write the next chapter.",
+      "Shakira helped the world see them. Together, we can help them write the next chapter.",
     copy: "The Ghetto Kids have inspired millions through their extraordinary talent, resilience, and joy. The Next Chapter Fund helps turn that global recognition into lasting opportunity through education, artistic development, mentorship, and long-term support.",
     primaryCta: "Support Their Next Chapter",
     secondaryCta: "Watch Their Story",
@@ -112,7 +112,7 @@ export const home = {
     eyebrow: "More Than a Moment",
     headline:
       "A global stage can create a moment. Opportunity turns that moment into a future.",
-    copy: "Their performance introduced millions of people to what those closest to them already knew: these young artists are exceptional. But lasting transformation requires more than recognition. It requires education, training, stability, mentorship, and access to the right opportunities.",
+    copy: "Millions of fans already knew what those closest to them have always known: these young artists are exceptional. Their performance on the world's biggest stage showed billions more. But lasting transformation requires more than recognition. It requires education, training, stability, mentorship, and access to the right opportunities.",
   },
   mission: {
     eyebrow: "Our Mission",
@@ -123,7 +123,7 @@ export const home = {
   story: {
     eyebrow: "Their Story",
     headline: "Talent born in Uganda. Joy shared with the world.",
-    copy: "Through dance, music, discipline, and community, the Ghetto Kids have built a story that has inspired audiences around the world. Their success is a testament to what can happen when talent meets opportunity. We want to help ensure that their next chapter is even greater than the moment that introduced them to millions.",
+    copy: "Through dance, music, discipline, and community, the Ghetto Kids have built a story that has inspired audiences around the world. Their success is a testament to what can happen when talent meets opportunity. We want to help ensure that their next chapter is even greater than the moment the whole world watched.",
     cta: "Discover Their Story",
     media: {
       src: "/images/story.svg",
@@ -407,11 +407,11 @@ export const storyPage = {
     },
     {
       title: "The world takes notice",
-      body: "Videos of the group's dancing began reaching audiences far beyond Uganda, earning millions of views and invitations to perform internationally. [PLACEHOLDER: Confirm specific milestones, appearances, and dates before publication.]",
+      body: "Long before any global stage, videos of the group's dancing were reaching audiences far beyond Uganda — millions of views, millions of followers, and invitations to perform internationally. They didn't need to be discovered; the world was already watching. [PLACEHOLDER: Confirm specific milestones, follower counts, appearances, and dates before publication.]",
     },
     {
       title: "A global stage",
-      body: "Their recent performance on one of the world's biggest stages introduced them to their largest audience yet. [PLACEHOLDER: Describe the performance factually once details and permissions are confirmed. Do not imply endorsement or sponsorship by any artist or organization.]",
+      body: "Their recent performance on one of the world's biggest stages put them in front of their largest audience yet — billions of viewers around the globe. [PLACEHOLDER: Describe the performance factually once details and permissions are confirmed. Do not imply endorsement or sponsorship by any artist or organization.]",
     },
     {
       title: "Beyond one moment",
