@@ -23,14 +23,13 @@ export default function Hero() {
     }
   }, [reduceMotion]);
 
-  const entrance = (delay: number) =>
-    reduceMotion
-      ? {}
-      : {
-          initial: { opacity: 0, y: 24 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.8, delay, ease: [0.21, 0.6, 0.35, 1] as const },
-        };
+  // Movement is stripped for reduced-motion users by MotionProvider;
+  // the opacity fade still completes so nothing stays hidden.
+  const entrance = (delay: number) => ({
+    initial: { opacity: 0, y: 24 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, delay, ease: [0.21, 0.6, 0.35, 1] as const },
+  });
 
   return (
     <section className="relative flex min-h-svh items-end overflow-hidden bg-ink">
@@ -108,23 +107,15 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2"
-        {...(reduceMotion
-          ? {}
-          : {
-              initial: { opacity: 0 },
-              animate: { opacity: 1 },
-              transition: { delay: 1.2, duration: 1 },
-            })}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 1 }}
       >
         <div className="flex h-12 w-7 items-start justify-center rounded-full border-2 border-cream/40 p-1.5">
           <motion.div
-            className="h-2 w-1 rounded-full bg-cream/70"
-            {...(reduceMotion
-              ? {}
-              : {
-                  animate: { y: [0, 14, 0], opacity: [1, 0.2, 1] },
-                  transition: { duration: 1.8, repeat: Infinity, ease: "easeInOut" },
-                })}
+            className="h-2 w-1 rounded-full bg-cream/70 motion-reduce:animate-none"
+            animate={{ y: [0, 14, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           />
         </div>
       </motion.div>
