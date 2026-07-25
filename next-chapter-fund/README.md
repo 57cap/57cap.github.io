@@ -107,10 +107,12 @@ nothing is sent. To make them live, either:
 3. Remove the `placeholderLabel` for any asset that's now real — the label chip
    disappears automatically.
 
-The hero currently uses a pure CSS gradient placeholder; swap it for a real
-photo/video by editing `src/components/home/Hero.tsx` (the marked
-"Full-bleed media placeholder" block) — e.g. an `<img>` or a muted, captioned
-`<video>` element.
+The hero plays a muted, looping background video configured in
+`home.hero.video` (in `site.ts`): `src` points to `public/videos/hero.mp4`
+and `poster` to `public/images/hero-poster.jpg` (also shown to
+reduced-motion visitors). To swap the footage, replace those files or update
+the paths — keep the video muted/audio-free, H.264 MP4, compressed for the
+web (e.g. `ffmpeg -i in.mov -an -c:v libx264 -crf 27 -movflags +faststart out.mp4`).
 
 ### Replacing the video placeholder
 

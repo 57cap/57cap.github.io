@@ -24,6 +24,8 @@ export type MediaAsset = {
 export type VideoAsset = {
   /** Path to an .mp4/.webm under /public, or an embed URL once confirmed */
   src: string;
+  /** Optional WebM alternative served alongside the mp4 for wider support */
+  webmSrc?: string;
   poster?: string;
   title: string;
   /** Path to a .vtt captions file under /public */
@@ -93,11 +95,18 @@ export const home = {
     copy: "The Ghetto Kids have inspired millions through their extraordinary talent, resilience, and joy. The Next Chapter Fund helps turn that global recognition into lasting opportunity through education, artistic development, mentorship, and long-term support.",
     primaryCta: "Support Their Next Chapter",
     secondaryCta: "Watch Their Story",
-    media: {
-      src: "/images/hero.svg",
-      alt: "The Ghetto Kids performing — hero image placeholder",
-      placeholderLabel: "Hero photo / video — performance footage (pending permissions)",
-    } satisfies MediaAsset,
+    /**
+     * Background video: muted, looping, no audio track. The poster
+     * image doubles as the reduced-motion / slow-connection fallback.
+     * Confirm guardian permissions for this footage before launch.
+     */
+    video: {
+      src: "/videos/hero.mp4",
+      webmSrc: "/videos/hero.webm",
+      poster: "/images/hero-poster.jpg",
+      title:
+        "The Ghetto Kids backstage, celebrating together after a performance",
+    } as VideoAsset,
   },
   moment: {
     eyebrow: "More Than a Moment",

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import ButtonLink from "@/components/ui/Button";
 import { home, donationUrl } from "@/config/site";
@@ -7,6 +8,20 @@ import { home, donationUrl } from "@/config/site";
 export default function Hero() {
   const reduceMotion = useReducedMotion();
   const { hero } = home;
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Some browsers (data-saver, strict autoplay policies) ignore the
+  // autoPlay attribute; nudge playback explicitly, and keep the video
+  // paused for visitors who prefer reduced motion.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (reduceMotion) {
+      video.pause();
+    } else {
+      video.play().catch(() => {});
+    }
+  }, [reduceMotion]);
 
   const entrance = (delay: number) =>
     reduceMotion
@@ -19,13 +34,33 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-svh items-end overflow-hidden bg-ink">
-      {/* Full-bleed media placeholder — replace with approved photo/video via src/config/site.ts */}
+      {/* Full-bleed background video — configured in src/config/site.ts.
+          Muted with no audio track; reduced-motion visitors get the poster frame. */}
       <div aria-hidden="true" className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_75%_10%,#e55e22_0%,#86300f_38%,#1c1917_78%)]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
-        <p className="absolute right-4 top-20 rounded-full bg-ink/50 px-4 py-2 text-[11px] font-medium tracking-wide text-cream/70 backdrop-blur sm:right-8 sm:top-24">
-          {hero.media.placeholderLabel}
-        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={hero.video.poster}
+          alt=""
+          className="absolute inset-0 hidden h-full w-full object-cover motion-reduce:block"
+        />
+        <video
+          ref={videoRef}
+          className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
+          poster={hero.video.poster}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          tabIndex={-1}
+        >
+          {hero.video.webmSrc && (
+            <source src={hero.video.webmSrc} type="video/webm" />
+          )}
+          <source src={hero.video.src} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-ink/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/10" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-40 sm:px-6 sm:pb-28 lg:px-8">
