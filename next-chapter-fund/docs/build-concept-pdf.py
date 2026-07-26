@@ -1,4 +1,5 @@
 import base64, pathlib
+from PIL import Image
 
 APP = pathlib.Path("/home/user/57cap.github.io/next-chapter-fund")
 SCRATCH = pathlib.Path("/tmp/claude-0/-home-user-57cap-github-io/3a9ec1dd-ceb7-5f0c-a943-d42e25f3440e/scratchpad")
@@ -9,16 +10,33 @@ def b64(path, mime):
 fraunces = b64(APP / "node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2", "font/woff2")
 inter    = b64(APP / "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2", "font/woff2")
 
+# Split the full-length homepage into two columns so the whole page can be
+# shown at a readable scale on one sheet.
+full = Image.open(SCRATCH / "doc/home-full.jpg")
+W, H = full.size
+half = H // 2
+cols = []
+for i in range(2):
+    top = i * half
+    bottom = H if i == 1 else half
+    seg = full.crop((0, top, W, bottom))
+    p = SCRATCH / f"doc/home-col{i}.jpg"
+    seg.save(p, quality=88)
+    cols.append((b64(p, "image/jpeg"), seg.size))
+print("columns", [c[1] for c in cols])
+
 img = {
     "cover":   b64(APP / "public/images/hero-poster.jpg", "image/jpeg"),
     "logo":    b64(APP / "public/images/ghetto-kids-logo-light.png", "image/png"),
-    "logoDark":b64(APP / "public/images/ghetto-kids-logo-dark.png", "image/png"),
     "hero":    b64(SCRATCH / "doc/home-hero.jpg", "image/jpeg"),
-    "support": b64(SCRATCH / "doc/home-support.jpg", "image/jpeg"),
     "donate":  b64(SCRATCH / "doc/donate.jpg", "image/jpeg"),
-    "story":   b64(SCRATCH / "doc/story.jpg", "image/jpeg"),
     "mobile":  b64(SCRATCH / "doc/mobile-home.jpg", "image/jpeg"),
 }
+
+# Column display height, derived from the real crop aspect so nothing distorts
+COL_W = 80.0
+col_h = [COL_W * s[1] / s[0] for _, s in cols]
+print("column height mm", [round(h, 1) for h in col_h])
 
 HTML = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>The Next Chapter Fund — Concept</title>
@@ -31,10 +49,8 @@ HTML = f"""<!doctype html>
 html,body {{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }}
 body {{ font-family:'InterV',sans-serif; color:#1c1917; background:#faf7f1; }}
 
-.page {{
-  width:210mm; height:297mm; position:relative; overflow:hidden;
-  page-break-after:always; background:#faf7f1;
-}}
+.page {{ width:210mm; height:297mm; position:relative; overflow:hidden;
+  page-break-after:always; background:#faf7f1; }}
 .page:last-child {{ page-break-after:auto; }}
 /* block flow, not flex: flex children shrink when a fixed-height page
    overflows, which silently collapses images to hairlines */
@@ -49,7 +65,6 @@ p  {{ font-size:9.7pt; line-height:1.62; color:#44403c; }}
 .lead {{ font-size:11pt; line-height:1.6; color:#3b3733; }}
 .small {{ font-size:8pt; line-height:1.5; color:#6b6259; }}
 
-/* ---------- cover ---------- */
 .cover {{ background:#1c1917; color:#faf7f1; }}
 .cover .art {{ position:absolute; inset:0; }}
 .cover .art img {{ width:100%; height:100%; object-fit:cover; }}
@@ -61,7 +76,6 @@ p  {{ font-size:9.7pt; line-height:1.62; color:#44403c; }}
 .lockup img {{ width:38mm; display:block; margin-top:3mm; }}
 .rule {{ height:2px; width:22mm; background:#e55e22; }}
 
-/* ---------- shared blocks ---------- */
 .grid2 {{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; }}
 .grid3 {{ display:grid; grid-template-columns:repeat(3,1fr); gap:5mm; }}
 .card {{ background:#fff; border:1px solid #e8e0d2; border-radius:3mm; padding:5mm; }}
@@ -164,43 +178,50 @@ p  {{ font-size:9.7pt; line-height:1.62; color:#44403c; }}
   <div class="foot"><p class="small">The Next Chapter Fund · Concept document</p><p class="small">2</p></div>
 </div></section>
 
-<!-- ============ 3 · THE SITE ============ -->
+<!-- ============ 3 · THE HOMEPAGE ============ -->
 <section class="page"><div class="pad">
-  <div class="eyebrow">The website</div>
-  <h2 style="margin-top:5mm; max-width:150mm">Built to be credible before it is public.</h2>
-  <p style="margin-top:5mm; max-width:155mm">
-    A complete site is built and ready — six pages covering their story, the mission,
-    the plan, transparency reporting, and donations. It is written to portray the
-    children as talented young artists with ambition and agency, never as objects of pity.
-    Nothing has been published.
+  <div class="eyebrow">The homepage</div>
+  <h2 style="margin-top:5mm; max-width:150mm">What a visitor sees first.</h2>
+  <p style="margin-top:4mm; max-width:158mm">
+    The page opens on footage from backstage, with the children's own mark above the
+    headline. Nothing has been published — this is the built site, shown privately.
   </p>
 
-  <div style="margin-top:7mm; display:grid; grid-template-columns:118mm 50mm; gap:6mm; align-items:start">
+  <div class="shot" style="margin-top:7mm; width:158mm"><img src="{img['hero']}" alt="The homepage as it opens on a laptop"></div>
+  <p class="cap">The opening frame. On the live site the background is moving footage, silent and looping.</p>
+
+  <div style="margin-top:6mm; display:grid; grid-template-columns:44mm 1fr; gap:6mm; align-items:start">
     <div>
-      <div class="shot"><img src="{img['hero']}" alt="Homepage on desktop"></div>
-      <p class="cap">Homepage — the opening frame, over footage from backstage.</p>
-    </div>
-    <div>
-      <div class="shot"><img src="{img['mobile']}" alt="Homepage on mobile"></div>
+      <div class="shot"><img src="{img['mobile']}" alt="The homepage on a phone"></div>
       <p class="cap">Built mobile-first.</p>
     </div>
-  </div>
-
-  <div class="grid2" style="margin-top:6mm">
     <div>
-      <div class="shot"><img src="{img['support']}" alt="Areas of support"></div>
-      <p class="cap">Six areas of support.</p>
-    </div>
-    <div>
-      <div class="shot"><img src="{img['donate']}" alt="Donation page"></div>
-      <p class="cap">Donations — one-time or monthly.</p>
+      <div class="shot"><img src="{img['donate']}" alt="The donation page"></div>
+      <p class="cap">Donations — one-time or monthly, with suggested giving levels.</p>
     </div>
   </div>
 
   <div class="foot"><p class="small">The Next Chapter Fund · Concept document</p><p class="small">3</p></div>
 </div></section>
 
-<!-- ============ 4 · CARE, STATUS, ASK ============ -->
+<!-- ============ 4 · HOMEPAGE END TO END ============ -->
+<section class="page"><div class="pad">
+  <div class="eyebrow">The homepage, end to end</div>
+  <h2 style="margin-top:5mm; max-width:150mm">The whole page, top to bottom.</h2>
+
+  <div style="margin-top:7mm; display:grid; grid-template-columns:{COL_W}mm {COL_W}mm; gap:6mm; align-items:start; justify-content:center">
+    <div class="shot"><img src="{cols[0][0]}" alt="Homepage, upper half"></div>
+    <div class="shot"><img src="{cols[1][0]}" alt="Homepage, lower half"></div>
+  </div>
+  <p class="cap" style="text-align:center; margin-top:3mm">
+    Read left column first, then right — hero, mission, the six areas of support, their story,
+    the three phases, donations, transparency, and the closing invitation.
+  </p>
+
+  <div class="foot"><p class="small">The Next Chapter Fund · Concept document</p><p class="small">4</p></div>
+</div></section>
+
+<!-- ============ 5 · CARE, STATUS, ASK ============ -->
 <section class="page"><div class="pad">
   <div class="eyebrow">How this is being handled</div>
   <h2 style="margin-top:5mm; max-width:150mm">Nothing goes live until the people closest to these children say yes.</h2>
@@ -236,7 +257,7 @@ p  {{ font-size:9.7pt; line-height:1.62; color:#44403c; }}
       <div class="eyebrow" style="font-size:7pt">Contact</div>
       <p class="small" style="margin-top:1.5mm; font-size:8.5pt">[Name] · [email] · [phone]</p>
     </div>
-    <p class="small">4</p>
+    <p class="small">5</p>
   </div>
 </div></section>
 
