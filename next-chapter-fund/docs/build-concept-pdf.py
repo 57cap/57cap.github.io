@@ -26,7 +26,9 @@ for i in range(2):
 print("columns", [c[1] for c in cols])
 
 img = {
-    "cover":   b64(APP / "public/images/hero-poster.jpg", "image/jpeg"),
+    # A warmer, closer frame than the site's hero poster — the cover wants a
+    # face, the hero wants the group.
+    "cover":   b64(APP / "docs/concept-cover.jpg", "image/jpeg"),
     "logo":    b64(APP / "public/images/ghetto-kids-logo-light.png", "image/png"),
     "hero":    b64(SCRATCH / "doc/home-hero.jpg", "image/jpeg"),
     "donate":  b64(SCRATCH / "doc/donate.jpg", "image/jpeg"),
