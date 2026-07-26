@@ -65,6 +65,21 @@ export const socialLinks: { label: string; href: string }[] = [
   { label: "Instagram", href: contact.instagram },
 ];
 
+/**
+ * The Ghetto Kids' own mark. Always presented with the "in support of"
+ * label so it reads as who the fund supports — never as the fund's own
+ * logo, which would imply an affiliation we don't claim.
+ * Written permission to use the mark is required before launch.
+ */
+export const supportedGroup = {
+  label: "In support of",
+  name: "Ghetto Kids",
+  /** White artwork, for dark backgrounds */
+  logoLight: "/images/ghetto-kids-logo-light.png",
+  /** Charcoal artwork, for light backgrounds */
+  logoDark: "/images/ghetto-kids-logo-dark.png",
+};
+
 /* ── Navigation ─────────────────────────────────────────────── */
 
 export const navigation: NavItem[] = [

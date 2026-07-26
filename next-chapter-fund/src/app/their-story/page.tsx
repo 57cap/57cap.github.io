@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/ui/SectionHeading";
 import MediaPlaceholder from "@/components/ui/MediaPlaceholder";
 import Reveal from "@/components/ui/Reveal";
+import SupportedMark from "@/components/ui/SupportedMark";
 import CtaBand from "@/components/CtaBand";
 import { storyPage } from "@/config/site";
 
@@ -17,9 +18,11 @@ export default function TheirStoryPage() {
       {/* Page hero */}
       <section className="bg-cream-deep/60 px-4 pb-20 pt-36 sm:px-6 sm:pt-44 lg:px-8">
         <div className="mx-auto max-w-7xl">
+          <Reveal className="mb-10">
+            <SupportedMark tone="dark" width={168} />
+          </Reveal>
           <SectionHeading
             as="h1"
-            eyebrow={storyPage.hero.eyebrow}
             headline={storyPage.hero.headline}
             copy={storyPage.hero.copy}
           />

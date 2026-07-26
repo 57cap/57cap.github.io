@@ -8,6 +8,7 @@ import {
   socialLinks,
 } from "@/config/site";
 import EmailSignupForm from "@/components/forms/EmailSignupForm";
+import SupportedMark from "@/components/ui/SupportedMark";
 
 export default function Footer() {
   return (
@@ -17,7 +18,8 @@ export default function Footer() {
           <div>
             <p className="font-display text-2xl font-semibold">{site.name}</p>
             <p className="mt-2 text-sm text-cream/60">{site.tagline}</p>
-            <div className="mt-8 max-w-md">
+            <SupportedMark tone="light" width={132} className="mt-8" />
+            <div className="mt-10 max-w-md">
               <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Follow the journey
               </p>

@@ -10,6 +10,11 @@ or legal status are unverified.
       name, image, story, and performance footage
 - [ ] Written approval from the Ghetto Kids' management/organization for the
       initiative and the use of the group's name
+- [ ] Written permission to use the **Ghetto Kids logo/wordmark**, which appears
+      on the homepage hero, the footer, and the Their Story page. It is always
+      paired with an "In support of" label so it never reads as the fund's own
+      mark — confirm the group is comfortable with that treatment, or supply an
+      approved lockup. Remove `SupportedMark` usages if permission is declined.
 - [ ] Signed media releases for every photo and video used on the site
 - [ ] Confirmation that testimonial quotes (if any) have written permission
 - [ ] Consent process documented for all future content featuring the children

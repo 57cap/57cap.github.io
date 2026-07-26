@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import ButtonLink from "@/components/ui/Button";
+import SupportedMark from "@/components/ui/SupportedMark";
 import { home, donationUrl } from "@/config/site";
 
 export default function Hero() {
@@ -63,12 +64,9 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-40 sm:px-6 sm:pb-28 lg:px-8">
-        <motion.p
-          {...entrance(0.05)}
-          className="mb-5 text-xs font-semibold uppercase tracking-[0.28em] text-ember-300"
-        >
-          {hero.eyebrow}
-        </motion.p>
+        <motion.div {...entrance(0.05)} className="mb-8">
+          <SupportedMark tone="light" width={158} />
+        </motion.div>
         <motion.h1
           {...entrance(0.15)}
           className="font-display max-w-4xl text-4xl font-semibold leading-[1.05] text-cream sm:text-5xl lg:text-7xl"
