@@ -78,6 +78,22 @@ CREATE TABLE IF NOT EXISTS goals (
     updated_at  TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS loops (
+    id          INTEGER PRIMARY KEY,
+    entity_id   INTEGER REFERENCES entities(id),
+    description TEXT NOT NULL,        -- what response/event is expected
+    waiting_on  TEXT DEFAULT 'them',  -- them (their move) | us (ER/system owes it)
+    expected_by TEXT,                 -- ISO date; past this = overdue, agents chase
+    status      TEXT DEFAULT 'open',  -- open | closed | dropped
+    outcome     TEXT,
+    source      TEXT DEFAULT '',      -- who/what opened it (agent name, 'action #12', ...)
+    nudges      INTEGER DEFAULT 0,    -- how many times we've chased
+    last_nudged TEXT,
+    created_at  TEXT NOT NULL,
+    closed_at   TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_loops_status ON loops(status, expected_by);
 CREATE INDEX IF NOT EXISTS idx_updates_entity ON updates(entity_id, occurred_at);
 CREATE INDEX IF NOT EXISTS idx_approvals_status ON approvals(status, created_at);
 CREATE INDEX IF NOT EXISTS idx_goals_entity ON goals(entity_id, horizon, status);

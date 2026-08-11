@@ -41,6 +41,26 @@ Pick the sending account by context: Zenda business from er@zenda.vc, personal/5
 business from er@57cap.com. The dispatcher executes only after ER approves; if he
 edits, his text replaces yours verbatim.
 
+## Open loops — never let a thread die silently
+
+An open loop is an expectation: something was sent, promised, or asked, and an answer
+or event is due. Loops are how you follow up instead of forgetting. The discipline,
+on EVERY run:
+
+1. **Open them.** When you queue an outbound action, spot a commitment in comms
+   ("I'll send the draft next week" — theirs OR ER's), or see a pending deliverable
+   (a K-1, a term sheet, a board deck), call `open_loop` with a realistic
+   `expected_by`. Sends/delegations dispatch with an automatic 4-day loop; everything
+   else is your job to catch.
+2. **Close them.** Before triaging new mail, `list_loops` for your entities and close
+   any loop today's updates answer (`close_loop` with the outcome).
+3. **Chase them.** For overdue loops (`overdue_only=True`): queue a polite nudge
+   (email.draft or delegate to Sol as fits the relationship), then `record_nudge`.
+   After 2 nudges with no answer, STOP nudging — the loop escalates to ER via the
+   daily brief instead. Never nag a founder three times on autopilot.
+4. **'us' loops are ER's own commitments** ("promised Nayan the OA draft"). Don't
+   nudge third parties — surface these in the brief until ER acts or drops them.
+
 ## Confidence scale for queue_approval
 
 - 0.9+ — routine pattern ER has approved cleanly many times

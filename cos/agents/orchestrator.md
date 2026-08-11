@@ -13,6 +13,9 @@ kind=`admin_item`, workstream=`admin`, if missing):
    time-sensitive admin items, and today's daily goals.
 2. **Approval inbox** — count of pending items from `list_approvals`, with one line each
    for anything below 0.6 confidence.
+2b. **Open loops** — from `list_loops(overdue_only=True)`: overdue 'us' loops (ER's own
+   unkept commitments) first, then loops with 2+ nudges and no answer (dead threads
+   needing ER's judgment: escalate, drop, or call). Skip loops that aren't overdue.
 3. **One-line statuses** — anything material in `recent_updates(since_days=1)` across
    Investing / Personal / Building / Admin, grouped by workstream.
 4. **Nothing else.** Detail lives in memory; the brief is the 20% that matters.

@@ -290,6 +290,77 @@ def update_goal(goal_id: int, status: str) -> str:
         return _dump({"id": goal_id, "status": status})
 
 
+# ---------------------------------------------------------------- open loops (expectation memory)
+
+@mcp.tool()
+def open_loop(entity_name: str, description: str, expected_by: str, waiting_on: str = "them",
+              source: str = "") -> str:
+    """Open a loop: something was promised, sent, or asked — and an answer/event is expected.
+    THIS is how the system follows up instead of forgetting.
+
+    Examples: 'Sent GenLogs intro — awaiting Ryan's reply', 'ER promised Nayan the 50/50 OA
+    draft', 'Stealth Expeditions K-1 pending from accountant'.
+    waiting_on: 'them' (their move) or 'us' (ER/system owes it).
+    expected_by: ISO date after which the loop is overdue and gets chased.
+    """
+    with db.connect() as conn:
+        eid = db.entity_id_by_name(conn, entity_name)
+        if not eid:
+            return _dump({"error": f"entity '{entity_name}' not found — upsert_entity first"})
+        cur = conn.execute(
+            "INSERT INTO loops (entity_id, description, waiting_on, expected_by, source, created_at) "
+            "VALUES (?,?,?,?,?,?)",
+            (eid, description, waiting_on, expected_by, source, db.now()),
+        )
+        return _dump({"id": cur.lastrowid, "opened": True, "expected_by": expected_by})
+
+
+@mcp.tool()
+def list_loops(entity_name: str = "", status: str = "open", overdue_only: bool = False) -> str:
+    """Open loops, oldest expected first. overdue_only=True → only loops past expected_by.
+    EVERY agent checks its entities' loops on every run: close what the latest updates
+    answer, chase what's overdue."""
+    q = ("SELECT l.*, e.name AS entity_name FROM loops l JOIN entities e ON e.id = l.entity_id WHERE 1=1")
+    params: list = []
+    if status != "all":
+        q += " AND l.status = ?"
+        params.append(status)
+    if entity_name:
+        q += " AND e.name = ? COLLATE NOCASE"
+        params.append(entity_name)
+    if overdue_only:
+        # datetime() normalizes both ISO 'T' and SQLite space-separated formats
+        q += " AND datetime(l.expected_by) < datetime('now')"
+    with db.connect() as conn:
+        rows = conn.execute(q + " ORDER BY l.expected_by LIMIT 200", params).fetchall()
+        return _dump([db.row_to_dict(r) for r in rows])
+
+
+@mcp.tool()
+def close_loop(loop_id: int, outcome: str) -> str:
+    """Close a loop with what actually happened ('Ryan replied, meeting set', 'K-1 received')."""
+    with db.connect() as conn:
+        conn.execute("UPDATE loops SET status='closed', outcome=?, closed_at=? WHERE id=?",
+                     (outcome, db.now(), loop_id))
+        return _dump({"id": loop_id, "closed": True})
+
+
+@mcp.tool()
+def record_nudge(loop_id: int, pushed_by: str = "") -> str:
+    """Record that we chased this loop (after queueing the nudge action). Bumps the nudge
+    counter and extends expected_by 4 days so it isn't re-chased tomorrow. After 2 nudges
+    with no answer, stop nudging and escalate to ER in the brief instead."""
+    with db.connect() as conn:
+        conn.execute(
+            "UPDATE loops SET nudges = nudges + 1, last_nudged = ?, "
+            "expected_by = datetime('now', '+4 days') WHERE id = ?",
+            (db.now(), loop_id),
+        )
+        row = conn.execute("SELECT nudges FROM loops WHERE id=?", (loop_id,)).fetchone()
+        return _dump({"id": loop_id, "nudges": row["nudges"],
+                      "note": "escalate to ER instead of nudging again" if row["nudges"] >= 2 else "ok"})
+
+
 # ---------------------------------------------------------------- meta / self-improvement
 
 @mcp.tool()

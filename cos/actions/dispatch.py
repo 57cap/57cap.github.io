@@ -112,6 +112,28 @@ def main() -> None:
                      f"Executed approved action #{row['id']}: {row['title']} → {status_note}",
                      db.now(), db.now()),
                 )
+            _open_followup(conn, row, payload)
+
+
+def _open_followup(conn, row, payload: dict) -> None:
+    """Every outbound message that expects an answer becomes an open loop.
+    Default: 4 days for sends/delegations. Override with payload follow_up_days
+    (0 disables — e.g. pure FYI notes). Drafts get no loop (ER decides if/when
+    to send); calendar events close themselves by happening."""
+    if payload["_action"] not in ("email.send", "delegate"):
+        return
+    days = payload.get("follow_up_days", 4)
+    if not days or not row["entity_id"]:
+        return
+    expected_by = conn.execute("SELECT datetime('now', ?)", (f"+{int(days)} days",)).fetchone()[0]
+    conn.execute(
+        "INSERT INTO loops (entity_id, description, waiting_on, expected_by, source, created_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (row["entity_id"],
+         f"Awaiting response to '{payload.get('subject', row['title'])}' "
+         f"(to {', '.join(payload.get('to', []))})",
+         "them", expected_by, f"action #{row['id']}", db.now()),
+    )
 
 
 if __name__ == "__main__":
