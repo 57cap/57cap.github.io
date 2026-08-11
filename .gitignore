@@ -67,3 +67,9 @@ node_modules/
 # Python
 __pycache__/
 *.pyc
+
+# Chief of Staff (cos/)
+cos/.env
+cos/.venv/
+cos/data/*.db
+cos/data/logs/

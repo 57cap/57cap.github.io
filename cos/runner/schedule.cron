@@ -1,0 +1,28 @@
+# Chief of Staff — agent schedule (VPS crontab)
+# Install:  crontab runner/schedule.cron   (after editing COS_HOME)
+# Times are UTC; stagger runs so the daily brief composes after the specialists.
+COS_HOME=/opt/cos
+PY=/opt/cos/.venv/bin/python
+
+# --- daily specialists (early morning) ---
+0  9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent portfolio_companies  >> data/logs/portfolio.log 2>&1
+5  9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent partner_funds        >> data/logs/funds.log 2>&1
+10 9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent personal_investments >> data/logs/personal.log 2>&1
+15 9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent admin                >> data/logs/admin.log 2>&1
+20 9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent research             >> data/logs/research.log 2>&1
+25 9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent builder              >> data/logs/builder.log 2>&1
+
+# --- daily brief, after the specialists have written to memory ---
+45 9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent orchestrator         >> data/logs/brief.log 2>&1
+
+# --- weekly meta (Sunday evening) ---
+0 22 * * 0   cd $COS_HOME && $PY -m runner.run_agent --agent meta --run-type weekly >> data/logs/meta.log 2>&1
+
+# --- monthly passes (1st of month) ---
+0 10 1 * *   cd $COS_HOME && $PY -m runner.run_agent --agent builder --run-type monthly              >> data/logs/builder.log 2>&1
+15 10 1 * *  cd $COS_HOME && $PY -m runner.run_agent --agent personal_investments --run-type monthly >> data/logs/personal.log 2>&1
+30 10 1 * *  cd $COS_HOME && $PY -m runner.run_agent --agent portfolio_companies --run-type monthly  >> data/logs/portfolio.log 2>&1
+
+# --- quarterly (Jan/Apr/Jul/Oct 2nd, after monthly data lands) ---
+0 11 2 1,4,7,10 *  cd $COS_HOME && $PY -m runner.run_agent --agent partner_funds --run-type quarterly  >> data/logs/funds.log 2>&1
+0 12 2 1,4,7,10 *  cd $COS_HOME && $PY -m runner.run_agent --agent fund_reporting --run-type quarterly >> data/logs/reporting.log 2>&1
