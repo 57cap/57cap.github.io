@@ -4,6 +4,10 @@
 COS_HOME=/opt/cos
 PY=/opt/cos/.venv/bin/python
 
+# --- ingestion + execution (all day) ---
+*/30 * * * * cd $COS_HOME && $PY -m ingest.gmail_ingest  >> data/logs/ingest.log 2>&1
+*/15 * * * * cd $COS_HOME && $PY -m actions.dispatch     >> data/logs/dispatch.log 2>&1
+
 # --- daily specialists (early morning) ---
 0  9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent portfolio_companies  >> data/logs/portfolio.log 2>&1
 5  9 * * *   cd $COS_HOME && $PY -m runner.run_agent --agent partner_funds        >> data/logs/funds.log 2>&1

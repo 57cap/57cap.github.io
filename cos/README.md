@@ -22,8 +22,16 @@ Inputs ──▶ Memory + Tools (MCP server, SQLite) ──▶ Agents (Claude Ag
 - **`runner/`** — thin Claude Agent SDK harness (`run_agent.py`) plus the cron
   schedule (`schedule.cron`): daily specialists → daily brief, weekly meta,
   monthly/quarterly passes.
+- **`ingest/`** — the multi-account Gmail worker: per-account OAuth (er@57cap.com +
+  er@zenda.vc natively), dedup by message id, newsletter filtering, cheap entity
+  matching; unmatched mail lands in "Unfiled Inbox" for agents to file.
+- **`actions/`** — the only bridge to the real world. Agents `queue_action`
+  (delegate-to-Sol emails, email drafts/sends, calendar events); the dispatcher
+  executes **only after ER approves**, uses ER's edited text verbatim, and records
+  every execution back into memory.
 - **`seed/`** — entity list to confirm and load (`python -m seed.seed`).
-- **`deploy/`** — VPS spec, Dockerfile, compose file, backup line.
+- **`deploy/`** — VPS spec, Google OAuth setup for both accounts, Dockerfile,
+  compose file, backup line.
 
 ## Quickstart (local)
 

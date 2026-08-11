@@ -39,6 +39,29 @@ crontab runner/schedule.cron
 .venv/bin/python -m memory.server --http    # or: docker compose -f deploy/docker-compose.yml up -d
 ```
 
+## Google OAuth for multiple accounts (~10 minutes, once)
+
+Both inboxes (er@57cap.com, er@zenda.vc) get native access — ingestion and outbound
+actions — via one OAuth client and one token per account:
+
+1. In [Google Cloud Console](https://console.cloud.google.com): create a project
+   (e.g. `cos-er`), enable the **Gmail API** and **Google Calendar API**.
+2. OAuth consent screen → Internal if the domains are Workspace-managed, else
+   External + add both addresses as test users.
+3. Credentials → Create credentials → **OAuth client ID → Desktop app**. Download the
+   JSON to `cos/data/secrets/credentials.json`.
+4. `cp config/accounts.example.yaml config/accounts.yaml` (already lists both accounts).
+5. On your laptop (needs a browser): `python -m ingest.authorize` — it opens a consent
+   window twice; sign in as er@57cap.com the first time, er@zenda.vc the second.
+6. Copy `data/secrets/token-*.json` to the VPS. Tokens refresh themselves headless
+   from then on.
+
+Then:
+```bash
+.venv/bin/python -m ingest.gmail_ingest     # first pull — check data/logs later via cron
+.venv/bin/python -m actions.dispatch --dry  # see what an execution cycle would do
+```
+
 ## Exposing the memory server safely (Phase A)
 
 The HTTP endpoint (`:8747/mcp`) has no auth of its own. Do **not** open the port to the

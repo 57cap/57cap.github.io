@@ -1,0 +1,29 @@
+# Copy to accounts.yaml (gitignored) and adjust.
+#
+# Each account gets its own Google OAuth token so the system reads/acts on
+# multiple inboxes natively — no forwarding tricks needed.
+#
+# One shared OAuth client (credentials.json) works for all accounts; each
+# account authorizes it once and gets its own token file. See deploy/VPS.md
+# "Google OAuth for multiple accounts" for the 10-minute setup.
+
+oauth_client: data/secrets/credentials.json   # OAuth client (Desktop app) from Google Cloud Console
+
+accounts:
+  - address: er@57cap.com
+    label: personal          # tags updates; agents use it to route workstreams
+    token: data/secrets/token-57cap.json
+    ingest: true             # poll this inbox
+    act: true                # allow drafts/sends/calendar events from this account
+
+  - address: er@zenda.vc
+    label: zenda
+    token: data/secrets/token-zenda.json
+    ingest: true
+    act: true
+
+ingest:
+  window: 2d                 # look-back per run (dedup makes overlap safe)
+  # Gmail search filters appended to every poll — tune to taste:
+  query: "-in:spam -in:trash -in:draft -category:promotions -category:social"
+  skip_newsletters: true     # skip messages with a List-Unsubscribe header unless they match an entity

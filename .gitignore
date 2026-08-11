@@ -73,3 +73,6 @@ cos/.env
 cos/.venv/
 cos/data/*.db
 cos/data/logs/
+cos/config/accounts.yaml
+cos/data/secrets/*
+!cos/data/secrets/.gitkeep

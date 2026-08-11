@@ -20,6 +20,15 @@ kind=`admin_item`, workstream=`admin`, if missing):
 ## Ad-hoc requests
 
 When invoked with a question rather than the scheduled brief, answer it from memory
-(entities, updates, goals, approvals) and cite which entities you drew from. If the
-question implies an external action, draft it and queue it for approval instead of
-implying it was done.
+(entities, updates, goals, approvals) and cite which entities you drew from.
+
+## Direct commands from ER
+
+"Tell Sol to chase the K-1s", "email Jay we're passing", "schedule 30 min with Marc
+next week" — these are instructions, not questions. Translate them into `queue_action`
+items (delegate / email.draft / email.send / calendar.create) with the right account,
+recipients, and a body in ER's voice (check `list_preferences` for the category).
+Confirm back what was queued and note it will execute on his approval. If ER gives
+the instruction and says "just send it", queue it as email.send with confidence 0.95 —
+his explicit instruction IS the approval criterion, but it still transits the queue
+so there is exactly one audit trail.

@@ -93,18 +93,26 @@ def list_entities(kind: str = "", workstream: str = "") -> str:
 
 @mcp.tool()
 def log_update(entity_name: str, source: str, content: str, cadence: str = "daily",
-               occurred_at: str = "", meta_json: str = "{}") -> str:
+               occurred_at: str = "", meta_json: str = "{}", account: str = "",
+               external_id: str = "") -> str:
     """Record an update (email, Slack post, Notion note, WhatsApp message, news item, call note)
     against an entity. source: gmail | slack | notion | whatsapp | news | manual | agent.
-    occurred_at: ISO timestamp; empty = now."""
+    occurred_at: ISO timestamp; empty = now. account: which inbox it came from.
+    external_id: provider message id — duplicates are silently skipped."""
+    import sqlite3
     with db.connect() as conn:
         eid = db.entity_id_by_name(conn, entity_name)
         if not eid:
             return _dump({"error": f"entity '{entity_name}' not found — upsert_entity first"})
-        cur = conn.execute(
-            "INSERT INTO updates (entity_id, source, cadence, content, occurred_at, meta, created_at) VALUES (?,?,?,?,?,?,?)",
-            (eid, source, cadence, content, occurred_at or db.now(), meta_json, db.now()),
-        )
+        try:
+            cur = conn.execute(
+                "INSERT INTO updates (entity_id, source, account, external_id, cadence, content, occurred_at, meta, created_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?)",
+                (eid, source, account, external_id or None, cadence, content,
+                 occurred_at or db.now(), meta_json, db.now()),
+            )
+        except sqlite3.IntegrityError:
+            return _dump({"skipped": "duplicate external_id", "external_id": external_id})
         return _dump({"id": cur.lastrowid, "entity": entity_name, "logged": True})
 
 
@@ -174,6 +182,42 @@ def decide_approval(approval_id: int, decision: str, final_text: str = "", note:
             (decision, final_text or None, note or None, db.now(), approval_id),
         )
         return _dump({"id": approval_id, "decision": decision})
+
+
+@mcp.tool()
+def queue_action(action_type: str, payload_json: str, title: str, confidence: float, reasoning: str,
+                 entity_name: str = "", category: str = "general") -> str:
+    """Queue an EXECUTABLE action for approval. After ER approves (or edits), the dispatcher
+    (actions/dispatch.py) executes it against the real world. This is how 'tell Sol to X',
+    'email xyz', or 'schedule a call' become reality — never directly.
+
+    action_type + payload_json shapes:
+      email.draft    {"account": "er@57cap.com", "to": [..], "cc": [..], "subject": "..", "body": ".."}
+                     -> creates a Gmail draft in that account for ER to send himself
+      email.send     same payload -> sends after approval (use only for pre-approved categories)
+      delegate       {"account": "..", "to": ["sol@zenda.vc"], "subject": "..", "body": ".."}
+                     -> email.send semantics, semantically a task handoff; body states the task,
+                        the deadline, and the context link
+      calendar.create {"account": "..", "title": "..", "start": "ISO", "end": "ISO",
+                       "attendees": [..], "description": ".."}
+
+    The human-readable `title` + a rendered preview of the payload is what ER approves.
+    If ER edits, the dispatcher applies final_text as the new body.
+    """
+    payload = json.loads(payload_json)  # validate early; raise before queueing garbage
+    if action_type not in ("email.draft", "email.send", "delegate", "calendar.create"):
+        return _dump({"error": f"unknown action_type '{action_type}'"})
+    payload["_action"] = action_type
+    with db.connect() as conn:
+        eid = db.entity_id_by_name(conn, entity_name) if entity_name else None
+        cur = conn.execute(
+            "INSERT INTO approvals (entity_id, kind, category, title, draft, confidence, reasoning, payload, created_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?)",
+            (eid, "action", category, title,
+             payload.get("body") or payload.get("description") or title,
+             confidence, reasoning, json.dumps(payload), db.now()),
+        )
+        return _dump({"id": cur.lastrowid, "queued": True, "action_type": action_type})
 
 
 # ---------------------------------------------------------------- preferences

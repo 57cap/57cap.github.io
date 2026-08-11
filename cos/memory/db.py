@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS updates (
     id          INTEGER PRIMARY KEY,
     entity_id   INTEGER REFERENCES entities(id),
     source      TEXT NOT NULL,        -- gmail | slack | notion | whatsapp | news | manual | agent
+    account     TEXT DEFAULT '',      -- which inbox/workspace it came from, e.g. er@57cap.com
+    external_id TEXT,                 -- provider id (gmail message id) for dedup
     cadence     TEXT DEFAULT 'daily',
     content     TEXT NOT NULL,
     occurred_at TEXT NOT NULL,
@@ -50,6 +52,9 @@ CREATE TABLE IF NOT EXISTS approvals (
     status      TEXT DEFAULT 'pending', -- pending | approved | edited | rejected | expired
     final_text  TEXT,
     note        TEXT,
+    payload     TEXT,                 -- JSON action executed after approval (email.send, email.draft, calendar.create, delegate)
+    executed_at TEXT,
+    execution_result TEXT,
     created_at  TEXT NOT NULL,
     decided_at  TEXT
 );
@@ -83,11 +88,28 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+MIGRATIONS = [
+    "ALTER TABLE approvals ADD COLUMN payload TEXT",
+    "ALTER TABLE approvals ADD COLUMN executed_at TEXT",
+    "ALTER TABLE approvals ADD COLUMN execution_result TEXT",
+    "ALTER TABLE updates ADD COLUMN account TEXT DEFAULT ''",
+    "ALTER TABLE updates ADD COLUMN external_id TEXT",
+]
+
+
 def connect() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    for stmt in MIGRATIONS:  # bring pre-existing DBs up to the current schema
+        try:
+            conn.execute(stmt)
+        except sqlite3.OperationalError:
+            pass  # column already exists
+    # after migrations so the column is guaranteed to exist
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_updates_external ON updates(external_id) "
+                 "WHERE external_id IS NOT NULL")
     return conn
 
 
