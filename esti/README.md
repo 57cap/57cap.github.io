@@ -8,8 +8,14 @@ lowercase copy, Instagram embeds, email capture for the first release.
 index.html        the whole page
 css/styles.css    design tokens + all styles
 js/site.js        scroll reveals, newsletter form, IG embed re-process
+fonts/            self-hosted woff2 (Young Serif, Outfit, IBM Plex Mono)
 media/            self-hosted video (+ og image) — see below
 ```
+
+Fonts are self-hosted (the exact latin builds Google Fonts serves) instead of
+loaded from fonts.googleapis.com — same rendering, faster, no third-party
+request. Embed wells keep their intended size with a quiet `· ig ·` label
+until Instagram fills them, so the layout never collapses while loading.
 
 ## Before going live
 

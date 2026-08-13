@@ -1,3 +1,33 @@
+/* self-hosted fonts (exact Google Fonts latin builds — see fonts/) */
+@font-face {
+  font-family: 'Young Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/young-serif-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('../fonts/outfit-variable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/ibm-plex-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/ibm-plex-mono-500.woff2') format('woff2');
+}
+
 :root {
   /* color — cool near-black w/ blue undertone + "cian 3am" accent */
   --bg: #101318;
@@ -201,12 +231,39 @@ input::placeholder { color: var(--text-faint); }
 }
 
 .embed-well {
+  position: relative;
   border-radius: var(--r-media);
   overflow: hidden;
   background: var(--surface-2);
   display: flex;
   justify-content: center;
 }
+
+/* hold the intended shape while instagram loads (or is unreachable),
+   with a quiet mono label behind the embed */
+.embed-well::before {
+  content: '· ig ·';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.embed-well .instagram-media { position: relative; z-index: 1; }
+
+/* the official blockquote ships an inline white background — keep it
+   invisible until embed.js actually fills it */
+.embed-well .instagram-media:empty { background: transparent !important; }
+
+/* reserved heights: post (hero) vs vertical reels */
+.well-post { min-height: min(560px, 118vw); }
+.well-reel { min-height: min(620px, 130vw); }
 
 /* ---------- sections ---------- */
 
@@ -334,6 +391,43 @@ input::placeholder { color: var(--text-faint); }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* shown by site.js only if the video file is missing */
+.video-fallback {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-media);
+  border: 1px dashed rgba(85,214,242,0.4);
+  background-color: var(--bg);
+  background-image: repeating-linear-gradient(45deg, rgba(232,238,252,0.04) 0px, rgba(232,238,252,0.04) 10px, transparent 10px, transparent 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+}
+
+.video-fallback .play-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(85,214,242,0.5);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.video-fallback .fallback-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+  color: var(--text-faint);
 }
 
 .chip-rec {

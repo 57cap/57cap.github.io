@@ -57,6 +57,20 @@ form.addEventListener('submit', (e) => {
   success.hidden = false;
 });
 
+/* ---------- pies video fallback ---------- */
+
+/* if media/pies-descalzos.mp4 isn't on the server yet, show a styled
+   placeholder instead of a broken player */
+const piesVideo = document.querySelector('.video-wrap video');
+piesVideo.addEventListener('error', () => {
+  const wrap = piesVideo.closest('.video-wrap');
+  piesVideo.remove();
+  const fb = document.createElement('div');
+  fb.className = 'video-fallback';
+  fb.innerHTML = '<span class="play-ring">▶</span><span class="fallback-label">video del proyecto — pronto</span>';
+  wrap.prepend(fb);
+});
+
 /* ---------- instagram embeds ---------- */
 
 /* embed.js processes blockquotes on load; poll briefly in case it
