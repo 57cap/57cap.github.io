@@ -1,32 +1,74 @@
-# ESTI — Portfolio Site
+# ESTI — sitio
 
-Single-page portfolio served at `https://57cap.github.io/esti/`.
+Flat static site (plain HTML + CSS + vanilla JS, no build step) built from the
+Claude Design handoff (`ESTI Portfolio.dc.html`). Single page, Spanish
+lowercase copy, Instagram embeds, email capture for the first release.
+
+```
+index.html        the whole page
+css/styles.css    design tokens + all styles
+js/site.js        scroll reveals, newsletter form, IG embed re-process
+media/            self-hosted video (+ og image) — see below
+```
+
+## Before going live
+
+1. **Pies Descalzos video** — get the file from ESTI, compress to H.264 ~720p,
+   save as `media/pies-descalzos.mp4`, and export a poster frame to
+   `media/pies-descalzos-poster.jpg`.
+2. **Newsletter endpoint** — set `SIGNUP_ENDPOINT` at the top of `js/site.js`
+   to a Buttondown / Formspree URL (or a tiny POST handler on the VPS).
+   Until then the form only shows the success state and stores nothing.
+3. **Footer links** — replace the `#` hrefs (instagram, tiktok, youtube,
+   soundcloud, press kit) with real URLs.
+4. **og:image** — add `media/og.jpg` (1200×630) and uncomment the
+   `og:image` meta tag in `index.html`.
 
 ## Updating content
 
-Almost everything on the page is rendered from **`data/content.json`** — edit that file, push, and the site updates. No HTML changes needed for day-to-day updates.
+- **Swap an Instagram embed**: change the `data-instgrm-permalink` URL on the
+  corresponding `<blockquote class="instagram-media">` in `index.html`.
+- **Add items to `creando:`**: copy a `<figure class="grid-item">` block and
+  follow the span rhythm (5/7/4/8…) via the `span-*` classes; add a matching
+  class in `styles.css` if a new span width is needed. On mobile everything
+  goes full-width automatically.
+- Note: Instagram embeds only render on an allowed origin (localhost or a real
+  domain) — not from `file://`.
 
-- **Hero** — `name`, `tagline`, `heroLinks` (streaming/social buttons).
-- **Music** — `music.featured` cards. Set `embedUrl` to a platform embed link:
-  - Spotify: open a track → Share → Embed → copy the iframe `src` (looks like `https://open.spotify.com/embed/track/...`).
-  - YouTube: `https://www.youtube.com/embed/VIDEO_ID`.
-  - SoundCloud: Share → Embed → copy the iframe `src`.
-  - `music.more` is the compact list of older releases.
-- **Bio** — `bio.paragraphs` (short on-page version). The full version lives in `press/index.html`.
-- **Sessions** — `sessions` array. Photos: set `src` to an image path in `img/`. Videos: set `type` to `"video"`, `src` to a thumbnail image, and `embedUrl` to a YouTube/Vimeo embed link (plays in the lightbox).
-- **Community** — `community` array: one card per initiative.
-- **Contact** — booking/management emails and footer social links.
+## Hosting on a VPS
 
-## Media guidelines
+Any static server works. Copy this folder to the server (e.g.
+`rsync -av esti/ user@vps:/var/www/esti/`) and serve it.
 
-- Put only **web-optimized images** in `img/` (~1600px wide max, a few hundred KB each). Audio/video stays on Spotify/SoundCloud/YouTube — never in the repo.
-- Press assets (high-res photos, one-sheet PDF) go in `press/` and get linked from `press/index.html`.
+nginx:
 
-## Local preview
+```nginx
+server {
+    listen 80;
+    server_name example.com;   # your domain
+    root /var/www/esti;
+    index index.html;
 
-Because content loads via `fetch`, open the site through a local server, not `file://`:
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
 
-```sh
-cd esti && python3 -m http.server 8000
-# then visit http://localhost:8000
+    location /media/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+}
 ```
+
+Caddy (automatic HTTPS):
+
+```
+example.com {
+    root * /var/www/esti
+    file_server
+    encode gzip
+    @media path /media/*
+    header @media Cache-Control "public, max-age=31536000, immutable"
+}
+```
+
+Quick local preview: `python3 -m http.server 8000` in this folder, then open
+http://localhost:8000.
