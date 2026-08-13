@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESTI — Artist · Songwriter · Community Builder</title>
+  <meta name="description" content="Official site of ESTI — music, studio sessions, song camps, and community initiatives.">
+  <meta property="og:title" content="ESTI">
+  <meta property="og:description" content="Music, studio sessions, song camps, and community initiatives.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav" id="nav">
+    <a class="nav-brand" href="#top">ESTI</a>
+    <nav class="nav-links">
+      <a href="#music">Music</a>
+      <a href="#bio">Bio</a>
+      <a href="#sessions">Sessions</a>
+      <a href="#community">Community</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="hero-kicker" id="hero-tagline"></p>
+        <h1 class="hero-name" id="hero-name">ESTI</h1>
+        <div class="hero-links" id="hero-links"></div>
+      </div>
+    </section>
+
+    <section class="section" id="music">
+      <h2 class="section-title">Music</h2>
+      <div class="featured-grid" id="music-featured"></div>
+      <ul class="more-list" id="music-more"></ul>
+    </section>
+
+    <div class="section-alt">
+      <section class="section" id="bio">
+        <h2 class="section-title">Bio</h2>
+        <div class="bio-body" id="bio-paragraphs"></div>
+        <a class="btn" id="bio-presskit" href="#">Full bio &amp; press kit</a>
+      </section>
+    </div>
+
+    <section class="section" id="sessions">
+      <h2 class="section-title">Song Camps &amp; Studio Sessions</h2>
+      <div class="gallery" id="sessions-gallery"></div>
+    </section>
+
+    <div class="section-alt">
+      <section class="section" id="community">
+        <h2 class="section-title">Community</h2>
+        <div class="community-grid" id="community-grid"></div>
+      </section>
+    </div>
+
+    <section class="section" id="contact">
+      <h2 class="section-title">Contact</h2>
+      <div class="contact-block" id="contact-block"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-socials" id="footer-socials"></div>
+    <p class="footer-copy">&copy; <span id="year"></span> ESTI. All rights reserved.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <div class="lightbox-content" id="lightbox-content"></div>
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
