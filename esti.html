@@ -242,7 +242,7 @@
     <p>La idea es descubrir qué cosas ya existen en ESTI y convertirlas en una identidad que la gente pueda reconocer.</p>
     <div class="rule"></div>
     <button class="btn" id="startBtn">Empezar</button>
-    <p class="note">37 preguntas. Se guarda solo después de cada respuesta.</p>
+    <p class="note">18 preguntas · 10–15 minutos. Se guarda solo después de cada respuesta.</p>
 
     <div id="resume">
       <div class="label">Entrevista sin terminar</div>
@@ -269,7 +269,7 @@
   <div class="track"><i id="track"></i></div>
   <div class="meta">
     <span class="label" id="sectionLabel">Quién es ESTI</span>
-    <span class="label count" id="counter">01 / 37</span>
+    <span class="label count" id="counter">01 / 18</span>
   </div>
 
   <div class="stage" id="stage">
@@ -303,7 +303,7 @@
     <h1 class="title">Listo. Ya tenemos suficiente para empezar a construir el mundo de ESTI.</h1>
 
     <div class="facts">
-      <div><span>Respondidas</span><b id="fAnswered">0 / 37</b></div>
+      <div><span>Respondidas</span><b id="fAnswered">0 / 18</b></div>
       <div><span>Palabras</span><b id="fWords">0</b></div>
       <div><span>Notas de voz</span><b id="fAudio">0</b></div>
       <div><span>Duración</span><b id="fTime">—</b></div>
@@ -350,7 +350,7 @@ var CONFIG = {
   bucket: 'esti-audio'
 };
 
-var STORE_KEY = 'esti_identity_interview_v2';
+var STORE_KEY = 'esti_identity_interview_v3';
 
 /* Categorias del output final estructurado */
 var CATS = [
@@ -369,101 +369,59 @@ var CATS = [
    PREGUNTAS — texto exacto, en orden
    =========================================================================== */
 var Q = [
-/* SECCION 1 — QUIÉN ES ESTI */
+/* 1 — QUIÉN ES ESTI */
 { n:1,  section:'QUIÉN ES ESTI', cat:'CORE IDENTITY',
   q:'Si tuvieras que describir a ESTI en solo 3 palabras, ¿cuáles serían?' },
 { n:2,  section:'QUIÉN ES ESTI', cat:'CORE IDENTITY',
-  q:'¿Qué tienes tú que sientes que no tiene otro artista de tu edad?' },
+  q:'¿Qué tienes tú que sientes que te hace diferente a otros artistas de tu edad?' },
 { n:3,  section:'QUIÉN ES ESTI', cat:'MIAMI x CARIBBEAN WORLD',
   q:'¿Qué partes de ti vienen de Miami y cuáles vienen del Caribe?' },
 { n:4,  section:'QUIÉN ES ESTI', cat:'CORE IDENTITY',
-  q:'¿Qué quieres que alguien sienta después de escuchar una canción de ESTI?' },
-{ n:5,  section:'QUIÉN ES ESTI', cat:'CORE IDENTITY',
-  q:'¿Qué cosas nunca haría ESTI porque simplemente no se sienten como tú?' },
+  q:'¿Qué quieres que alguien sienta cuando escucha una canción de ESTI?' },
 
-/* SECCION 2 — PERSONALIDAD / AMOR */
-{ n:6,  section:'PERSONALIDAD / AMOR', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Cómo eres tú cuando te gusta alguien?' },
-{ n:7,  section:'PERSONALIDAD / AMOR', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Cómo eres tú cuando ya estás enamorado?' },
-{ n:8,  section:'PERSONALIDAD / AMOR', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Cómo eres tú cuando una relación se empieza a joder?' },
-{ n:9,  section:'PERSONALIDAD / AMOR', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Cuál es tu contradicción más grande cuando se trata de amor?' },
-{ n:10, section:'PERSONALIDAD / AMOR', cat:'PERSONALITY',
+/* 2 — PERSONALIDAD */
+{ n:5,  section:'PERSONALIDAD', cat:'LOVE / RELATIONSHIPS',
+  q:'¿Cómo eres cuando te gusta alguien y cómo cambias cuando de verdad te enamoras?' },
+{ n:6,  section:'PERSONALIDAD', cat:'LOVE / RELATIONSHIPS',
+  q:'¿Cuál es tu mayor contradicción cuando se trata de amor?' },
+{ n:7,  section:'PERSONALIDAD', cat:'PERSONALITY',
   q:'¿Qué error tiendes a repetir aunque sabes que probablemente no deberías?' },
-{ n:11, section:'PERSONALIDAD / AMOR', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Qué te da más miedo cuando de verdad te importa alguien?' },
-{ n:12, section:'PERSONALIDAD / AMOR', cat:'PERSONALITY',
+{ n:8,  section:'PERSONALIDAD', cat:'PERSONALITY',
   q:'¿Qué tan diferente es ESTI artista de Esti en la vida real?' },
 
-/* SECCION 3 — EL MUNDO VISUAL */
-{ n:13, section:'EL MUNDO VISUAL', cat:'VISUAL CODES',
+/* 3 — MUNDO VISUAL */
+{ n:9,  section:'MUNDO VISUAL', cat:'VISUAL CODES',
   q:'Si ESTI fuera un color, ¿cuál sería y por qué?' },
-{ n:14, section:'EL MUNDO VISUAL', cat:'VISUAL CODES',
-  q:'¿Qué prenda o accesorio usarías tanto que podría convertirse en algo que la gente asocie contigo?' },
-{ n:15, section:'EL MUNDO VISUAL', cat:'VISUAL CODES',
-  q:'Si alguien quisiera disfrazarse de ESTI para Halloween, ¿qué tendría que ponerse o hacer para que todo el mundo entendiera quién es?' },
-{ n:16, section:'EL MUNDO VISUAL', cat:'MIAMI x CARIBBEAN WORLD',
-  q:'¿Qué 3 lugares representan mejor tu mundo?' },
-{ n:17, section:'EL MUNDO VISUAL', cat:'VISUAL CODES',
-  q:'¿Tu mundo se siente más como día, sunset, noche o madrugada? ¿Por qué?' },
-{ n:18, section:'EL MUNDO VISUAL', cat:'VISUAL CODES',
-  q:'¿Qué objeto, símbolo, animal, textura o imagen sientes que podría aparecer una y otra vez en el mundo de ESTI?' },
+{ n:10, section:'MUNDO VISUAL', cat:'VISUAL CODES',
+  q:'Si alguien quisiera disfrazarse de ESTI para Halloween, ¿qué tendría que ponerse, llevar o hacer para que todo el mundo entendiera quién es?' },
+{ n:11, section:'MUNDO VISUAL', cat:'VISUAL CODES',
+  q:'¿Qué 3 lugares, momentos u objetos representan mejor el mundo de ESTI?' },
 
-/* SECCION 4 — SONIDO */
-{ n:19, section:'SONIDO', cat:'SONIC CODES',
+/* 4 — SONIDO */
+{ n:12, section:'SONIDO', cat:'SONIC CODES',
   q:'Si alguien escucha 10 segundos de una canción sin saber quién canta, ¿qué debería hacerle pensar “ese es ESTI”?' },
-{ n:20, section:'SONIDO', cat:'SONIC CODES',
-  q:'¿Qué sonidos o instrumentos de la Costa realmente sientes tuyos?' },
-{ n:21, section:'SONIDO', cat:'SONIC CODES',
-  q:'¿Qué influencias anglo sientes más naturales para ti?' },
-{ n:22, section:'SONIDO', cat:'LANGUAGE / PHRASES / GESTURES',
-  q:'¿Qué palabra, frase, sonido, gesto o ad-lib ya haces naturalmente y podría convertirse en algo tuyo?',
-  note:'No busques inventar nada. Piensa en algo que ya dices o ya haces sin pensarlo.' },
-{ n:23, section:'SONIDO', cat:'SONIC CODES',
-  q:'¿Qué instrumento, textura o sonido podría aparecer varias veces en tu música sin que todas las canciones suenen iguales?' },
+{ n:13, section:'SONIDO', cat:'SONIC CODES',
+  q:'¿Qué sonidos, instrumentos o influencias sientes genuinamente tuyos?' },
+{ n:14, section:'SONIDO', cat:'LANGUAGE / PHRASES / GESTURES',
+  q:'¿Hay alguna palabra, frase, sonido, gesto o cosa que ya haces naturalmente y que la gente podría terminar asociando contigo? No inventes una por branding: piensa en cosas que ya haces.' },
 
-/* SECCION 5 — FANS / CULTURA */
-{ n:24, section:'FANS / CULTURA', cat:'FAN CULTURE',
-  q:'¿Qué podría copiar un fan de ESTI?' },
-{ n:25, section:'FANS / CULTURA', cat:'LANGUAGE / PHRASES / GESTURES',
-  q:'¿Qué frase de una canción tuya te imaginas que alguien podría usar de caption?' },
-{ n:26, section:'FANS / CULTURA', cat:'FAN CULTURE',
-  q:'¿Qué quieres que tengan en común los pelaos que se vuelvan fans tuyos?' },
-{ n:27, section:'FANS / CULTURA', cat:'FAN CULTURE',
-  q:'¿Qué pequeño detalle quieres que reconozca un fan de ESTI antes que alguien casual?' },
-{ n:28, section:'FANS / CULTURA', cat:'FAN CULTURE',
-  q:'¿Qué quieres que pase entre el público cuando empiezan los primeros 5 segundos de una canción tuya?' },
+/* 5 — FANS */
+{ n:15, section:'FANS', cat:'FAN CULTURE',
+  q:'Si alguien se vuelve fanático de ESTI, ¿qué crees que es lo que más le gustaría o con qué se identificaría de ti?' },
+{ n:16, section:'FANS', cat:'FAN CULTURE',
+  q:'¿Qué podría copiar, usar, decir o hacer un fan para que otro fan de ESTI inmediatamente lo reconozca?' },
 
-/* SECCION 6 — FUI YO */
-{ n:29, section:'FUI YO', cat:'FUI YO',
+/* 6 — FUI YO */
+{ n:17, section:'FUI YO', cat:'FUI YO',
   interstitial:{
     title:'FUI YO',
     lines:['Primeros amores.\nPrimeros errores.',
            'Miami x Caribe.',
            'Romántico, fresco, medio perro y todavía aprendiendo a querer.']
   },
-  q:'¿Qué partes de FUI YO has vivido realmente?' },
-{ n:30, section:'FUI YO', cat:'FUI YO',
-  q:'¿Quién eres tú al comienzo de esta historia?' },
-{ n:31, section:'FUI YO', cat:'FUI YO',
-  q:'¿Quién eres al final?' },
-{ n:32, section:'FUI YO', cat:'FUI YO',
-  q:'En el arco del EP hay un momento donde te enamoras de verdad y después la cagas. ¿Qué podría pasar ahí que se sienta real para ti?' },
-{ n:33, section:'FUI YO', cat:'FUI YO',
-  q:'¿Cuál sería una situación real que explique que después puedas decir: “tanto esperaste que cambiara / justo cambié cuando no estabas”?' },
-{ n:34, section:'FUI YO', cat:'FUI YO',
-  q:'¿Qué significa para ti decir “FUI YO”?' },
-{ n:35, section:'FUI YO', cat:'FUI YO',
-  q:'Después de todo lo que pasa en el EP, ¿crees que ESTI aprendió o probablemente lo vuelve a hacer?' },
-
-/* FINAL */
-{ n:36, section:'FINAL', cat:'FAN CULTURE',
-  q:'Si mañana 100 personas quisieran vestirse, hablar y actuar como ESTI, ¿qué harían?' },
-{ n:37, section:'FINAL', cat:'CORE IDENTITY', optional:true,
-  q:'¿Hay algo importante de ESTI que ninguna de estas preguntas te preguntó?',
-  note:'Opcional. Si no hay nada, puedes terminar aquí.' }
+  q:'¿Qué significa para ti FUI YO y qué partes de esa historia has vivido realmente?' },
+{ n:18, section:'FUI YO', cat:'FAN CULTURE',
+  q:'Pregunta final: Si mañana 100 personas quisieran vestirse, hablar, escuchar música y vivir un poquito como ESTI, ¿cómo se verían? ¿Qué usarían, qué dirían, qué escucharían y qué harían?' }
 ];
 
 var TOTAL = Q.length;
