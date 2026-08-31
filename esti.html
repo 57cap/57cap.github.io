@@ -336,6 +336,7 @@
     <div class="tools">
       <button id="admLoad">Cargar de la base</button>
       <button id="admLocal">Sesión de este dispositivo</button>
+      <button id="admDlRaw">Descargar preguntas y respuestas (.txt)</button>
       <button id="admDlTxt">Descargar resumen (.md)</button>
       <button id="admDlJson">Descargar JSON</button>
       <button id="admCopy">Copiar resumen</button>
@@ -1033,6 +1034,23 @@ function summaryText(s){
   return L.join('\n');
 }
 
+/* Volcado plano: número, pregunta y respuesta tal cual. Sin agrupar ni resumir. */
+function rawText(s){
+  var L = [];
+  L.push('ESTI IDENTITY INTERVIEW — ' + s.session_id);
+  var answered = s.responses.filter(function(r){ return (r.answer_text || '').trim(); }).length;
+  L.push(fmtDate(s.created_at) + ' · ' + answered + ' / ' + s.responses.length + ' respondidas');
+  s.responses.forEach(function(r){
+    L.push('');
+    L.push('');
+    L.push(String(r.question_number).padStart(2,'0') + '. ' + r.question_text);
+    L.push((r.answer_text || '').trim() || '(sin respuesta)');
+    if (r.audio_url) L.push('[nota de voz] ' + r.audio_url);
+  });
+  L.push('');
+  return L.join('\n');
+}
+
 function download(name, data, type){
   var blob = (data instanceof Blob) ? data : new Blob([data], { type: type || 'text/plain;charset=utf-8' });
   var url = URL.createObjectURL(blob);
@@ -1184,6 +1202,10 @@ function admGuard(){
   alert('Primero dale a “Cargar de la base” o a “Sesión de este dispositivo”.');
   return false;
 }
+$('admDlRaw').addEventListener('click', function(){
+  if (!admGuard()) return;
+  download(admName('txt'), admSessions.map(rawText).join('\n\n\n'));
+});
 $('admDlTxt').addEventListener('click', function(){
   if (!admGuard()) return;
   download(admName('md'), admSessions.map(summaryText).join('\n\n\n'), 'text/markdown;charset=utf-8');
