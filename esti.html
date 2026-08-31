@@ -242,7 +242,7 @@
     <p>La idea es descubrir qué cosas ya existen en ESTI y convertirlas en una identidad que la gente pueda reconocer.</p>
     <div class="rule"></div>
     <button class="btn" id="startBtn">Empezar</button>
-    <p class="note">18 preguntas · 10–15 minutos. Se guarda solo después de cada respuesta.</p>
+    <p class="note">19 preguntas · 10–15 minutos. Se guarda solo después de cada respuesta.</p>
 
     <div id="resume">
       <div class="label">Entrevista sin terminar</div>
@@ -269,7 +269,7 @@
   <div class="track"><i id="track"></i></div>
   <div class="meta">
     <span class="label" id="sectionLabel">Quién es ESTI</span>
-    <span class="label count" id="counter">01 / 18</span>
+    <span class="label count" id="counter">01 / 19</span>
   </div>
 
   <div class="stage" id="stage">
@@ -303,7 +303,7 @@
     <h1 class="title">Listo. Ya tenemos suficiente para empezar a construir el mundo de ESTI.</h1>
 
     <div class="facts">
-      <div><span>Respondidas</span><b id="fAnswered">0 / 18</b></div>
+      <div><span>Respondidas</span><b id="fAnswered">0 / 19</b></div>
       <div><span>Palabras</span><b id="fWords">0</b></div>
       <div><span>Notas de voz</span><b id="fAudio">0</b></div>
       <div><span>Duración</span><b id="fTime">—</b></div>
@@ -350,7 +350,7 @@ var CONFIG = {
   bucket: 'esti-audio'
 };
 
-var STORE_KEY = 'esti_identity_interview_v3';
+var STORE_KEY = 'esti_identity_interview_v4';
 
 /* Categorias del output final estructurado */
 var CATS = [
@@ -380,39 +380,41 @@ var Q = [
   q:'¿Qué quieres que alguien sienta cuando escucha una canción de ESTI?' },
 
 /* 2 — PERSONALIDAD */
-{ n:5,  section:'PERSONALIDAD', cat:'LOVE / RELATIONSHIPS',
-  q:'¿Cómo eres cuando te gusta alguien y cómo cambias cuando de verdad te enamoras?' },
+{ n:5,  section:'PERSONALIDAD', cat:'PERSONALITY',
+  q:'Cuando tienes varios días completamente libres y nadie te está diciendo qué hacer, ¿en qué terminas gastando tu tiempo?' },
 { n:6,  section:'PERSONALIDAD', cat:'LOVE / RELATIONSHIPS',
+  q:'¿Cómo eres cuando te gusta alguien y cómo cambias cuando de verdad te enamoras?' },
+{ n:7,  section:'PERSONALIDAD', cat:'LOVE / RELATIONSHIPS',
   q:'¿Cuál es tu mayor contradicción cuando se trata de amor?' },
-{ n:7,  section:'PERSONALIDAD', cat:'PERSONALITY',
-  q:'¿Qué error tiendes a repetir aunque sabes que probablemente no deberías?' },
 { n:8,  section:'PERSONALIDAD', cat:'PERSONALITY',
+  q:'¿Qué error tiendes a repetir aunque sabes que probablemente no deberías?' },
+{ n:9,  section:'PERSONALIDAD', cat:'PERSONALITY',
   q:'¿Qué tan diferente es ESTI artista de Esti en la vida real?' },
 
 /* 3 — MUNDO VISUAL */
-{ n:9,  section:'MUNDO VISUAL', cat:'VISUAL CODES',
+{ n:10,  section:'MUNDO VISUAL', cat:'VISUAL CODES',
   q:'Si ESTI fuera un color, ¿cuál sería y por qué?' },
-{ n:10, section:'MUNDO VISUAL', cat:'VISUAL CODES',
-  q:'Si alguien quisiera disfrazarse de ESTI para Halloween, ¿qué tendría que ponerse, llevar o hacer para que todo el mundo entendiera quién es?' },
 { n:11, section:'MUNDO VISUAL', cat:'VISUAL CODES',
+  q:'Si alguien quisiera disfrazarse de ESTI para Halloween, ¿qué tendría que ponerse, llevar o hacer para que todo el mundo entendiera quién es?' },
+{ n:12, section:'MUNDO VISUAL', cat:'VISUAL CODES',
   q:'¿Qué 3 lugares, momentos u objetos representan mejor el mundo de ESTI?' },
 
 /* 4 — SONIDO */
-{ n:12, section:'SONIDO', cat:'SONIC CODES',
-  q:'Si alguien escucha 10 segundos de una canción sin saber quién canta, ¿qué debería hacerle pensar “ese es ESTI”?' },
 { n:13, section:'SONIDO', cat:'SONIC CODES',
+  q:'Si alguien escucha 10 segundos de una canción sin saber quién canta, ¿qué debería hacerle pensar “ese es ESTI”?' },
+{ n:14, section:'SONIDO', cat:'SONIC CODES',
   q:'¿Qué sonidos, instrumentos o influencias sientes genuinamente tuyos?' },
-{ n:14, section:'SONIDO', cat:'LANGUAGE / PHRASES / GESTURES',
+{ n:15, section:'SONIDO', cat:'LANGUAGE / PHRASES / GESTURES',
   q:'¿Hay alguna palabra, frase, sonido, gesto o cosa que ya haces naturalmente y que la gente podría terminar asociando contigo? No inventes una por branding: piensa en cosas que ya haces.' },
 
 /* 5 — FANS */
-{ n:15, section:'FANS', cat:'FAN CULTURE',
-  q:'Si alguien se vuelve fanático de ESTI, ¿qué crees que es lo que más le gustaría o con qué se identificaría de ti?' },
 { n:16, section:'FANS', cat:'FAN CULTURE',
+  q:'Si alguien se vuelve fanático de ESTI, ¿qué crees que es lo que más le gustaría o con qué se identificaría de ti?' },
+{ n:17, section:'FANS', cat:'FAN CULTURE',
   q:'¿Qué podría copiar, usar, decir o hacer un fan para que otro fan de ESTI inmediatamente lo reconozca?' },
 
 /* 6 — FUI YO */
-{ n:17, section:'FUI YO', cat:'FUI YO',
+{ n:18, section:'FUI YO', cat:'FUI YO',
   interstitial:{
     title:'FUI YO',
     lines:['Primeros amores.\nPrimeros errores.',
@@ -420,7 +422,7 @@ var Q = [
            'Romántico, fresco, medio perro y todavía aprendiendo a querer.']
   },
   q:'¿Qué significa para ti FUI YO y qué partes de esa historia has vivido realmente?' },
-{ n:18, section:'FUI YO', cat:'FAN CULTURE',
+{ n:19, section:'FUI YO', cat:'FAN CULTURE',
   q:'Pregunta final: Si mañana 100 personas quisieran vestirse, hablar, escuchar música y vivir un poquito como ESTI, ¿cómo se verían? ¿Qué usarían, qué dirían, qué escucharían y qué harían?' }
 ];
 
