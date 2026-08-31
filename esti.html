@@ -99,9 +99,9 @@
   .btn.line:hover{border-color:var(--text);}
   .btn + .btn{margin-top:10px;}
   .note{color:var(--muted);font-size:13px;margin-top:18px;}
-  #resume{display:none;border-top:1px solid var(--line);margin-top:34px;padding-top:22px;}
-  #resume .rowbtns{display:flex;gap:10px;margin-top:14px;}
-  #resume .rowbtns .btn{margin:0;}
+  #resume,#finished{display:none;border-top:1px solid var(--line);margin-top:34px;padding-top:22px;}
+  #resume .rowbtns,#finished .rowbtns{display:flex;gap:10px;margin-top:14px;}
+  #resume .rowbtns .btn,#finished .rowbtns .btn{margin:0;}
 
   /* ---------------- INTERVIEW ---------------- */
   #interview{overflow:hidden;}
@@ -250,6 +250,14 @@
       <div class="rowbtns">
         <button class="btn line" id="resumeBtn">Continuar</button>
         <button class="btn line" id="freshBtn">Empezar de cero</button>
+      </div>
+    </div>
+
+    <div id="finished">
+      <div class="label">Entrevista terminada</div>
+      <p class="note" id="finishedInfo" style="margin-top:10px;"></p>
+      <div class="rowbtns">
+        <button class="btn line" id="openDoneBtn">Ver y enviar mis respuestas</button>
       </div>
     </div>
   </div>
@@ -706,6 +714,8 @@ function queueSave(){
 function capture(){
   var q = Q[state.idx];
   if (!q) return;
+  /* fuera de la entrevista el textarea esta vacio: no puede pisar una respuesta */
+  if (!$('interview').classList.contains('on')) return;
   var rec = state.answers[String(q.n)] || blankAnswer(q.n);
   rec.answer_text = answer.value;
   rec.section = q.section;
@@ -931,7 +941,7 @@ function audioCount(){
 function finish(){
   stopDictation(); stopRec();
   capture();
-  state.completed_at = new Date().toISOString();
+  if (!state.completed_at) state.completed_at = new Date().toISOString();
   save();
   track.style.width = '100%';
   $('fAnswered').textContent = answeredCount() + ' / ' + TOTAL;
@@ -1170,9 +1180,16 @@ function begin(fresh){
   openQuestion(state.idx || 0);
 }
 
-$('startBtn').addEventListener('click', function(){ begin(true); });
+function startFresh(){
+  var prev = loadSaved();
+  var some = prev && (prev.completed_at || prev.idx > 0);
+  if (some && !confirm('Ya hay una entrevista guardada en este dispositivo. Si empiezas de nuevo se borra. ¿Seguro?')) return;
+  begin(true);
+}
+$('startBtn').addEventListener('click', startFresh);
 $('resumeBtn').addEventListener('click', function(){ begin(false); });
-$('freshBtn').addEventListener('click', function(){ begin(true); });
+$('freshBtn').addEventListener('click', startFresh);
+$('openDoneBtn').addEventListener('click', function(){ begin(false); });
 window.addEventListener('hashchange', function(){ location.reload(); });
 
 (function boot(){
@@ -1187,7 +1204,12 @@ window.addEventListener('hashchange', function(){ location.reload(); });
   }
 
   var saved = loadSaved();
-  if (saved && !saved.completed_at && saved.idx > 0){
+  if (saved && saved.completed_at){
+    $('finished').style.display = 'block';
+    $('finishedInfo').textContent = 'La terminaste el ' + fmtDate(saved.completed_at) +
+      ' · Tus respuestas siguen guardadas en este dispositivo.';
+    $('startBtn').textContent = 'Empezar una nueva';
+  } else if (saved && !saved.completed_at && saved.idx > 0){
     var done = 0;
     for (var k in saved.answers){
       var a = saved.answers[k];
