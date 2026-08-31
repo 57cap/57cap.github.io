@@ -1070,7 +1070,34 @@ $('reviewBtn').addEventListener('click', function(){
    =========================================================================== */
 var admSessions = [];
 
+/* Una sesión de la base solo trae las filas que alcanzó a contestar.
+   La completamos contra las 19 preguntas para ver el hueco real. */
+function normalizeSession(s){
+  var byN = {};
+  (s.responses || []).forEach(function(r){ byN[r.question_number] = r; });
+  var full = Q.map(function(q){
+    var r = byN[q.n];
+    return {
+      session_id: s.session_id,
+      created_at: s.created_at,
+      completed_at: s.completed_at,
+      question_number: q.n,
+      section: (r && r.section) || q.section,
+      question_text: (r && r.question_text) || q.q,
+      answer_text: r ? (r.answer_text || '') : '',
+      audio_url: r ? (r.audio_url || null) : null
+    };
+  });
+  return {
+    session_id: s.session_id,
+    created_at: s.created_at,
+    completed_at: s.completed_at,
+    responses: full
+  };
+}
+
 function admRender(list){
+  list = list.map(normalizeSession);
   admSessions = list;
   var box = $('admBody');
   if (!list.length){ box.innerHTML = '<p class="sub">Sin respuestas todavía.</p>'; return; }
