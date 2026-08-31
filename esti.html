@@ -336,6 +336,8 @@
     <div class="tools">
       <button id="admLoad">Cargar de la base</button>
       <button id="admLocal">Sesión de este dispositivo</button>
+      <button id="admDlTxt">Descargar resumen (.md)</button>
+      <button id="admDlJson">Descargar JSON</button>
       <button id="admCopy">Copiar resumen</button>
       <button id="admExit">Ir a la entrevista</button>
     </div>
@@ -1173,6 +1175,23 @@ $('admCopy').addEventListener('click', function(){
     $('admCopy').textContent = 'Copiado';
     setTimeout(function(){ $('admCopy').textContent = 'Copiar resumen'; }, 1600);
   });
+});
+function admName(ext){
+  return (admSessions.length === 1 ? admSessions[0].session_id : 'esti-interviews') + '.' + ext;
+}
+function admGuard(){
+  if (admSessions.length) return true;
+  alert('Primero dale a “Cargar de la base” o a “Sesión de este dispositivo”.');
+  return false;
+}
+$('admDlTxt').addEventListener('click', function(){
+  if (!admGuard()) return;
+  download(admName('md'), admSessions.map(summaryText).join('\n\n\n'), 'text/markdown;charset=utf-8');
+});
+$('admDlJson').addEventListener('click', function(){
+  if (!admGuard()) return;
+  var data = admSessions.length === 1 ? admSessions[0] : admSessions;
+  download(admName('json'), JSON.stringify(data, null, 2), 'application/json');
 });
 $('admExit').addEventListener('click', function(){ location.hash = ''; location.reload(); });
 
